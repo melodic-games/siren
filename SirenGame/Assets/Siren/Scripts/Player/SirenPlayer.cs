@@ -1,5 +1,6 @@
 ﻿using KinematicCharacterController.Examples;
 using UnityEngine;
+using UnityEngine.InputSystem.Controls;
 
 namespace Siren.Scripts.Player
 {
@@ -8,9 +9,11 @@ namespace Siren.Scripts.Player
         public ExampleCharacterCamera orbitCamera;
         public Transform cameraFollowPoint;
         public SirenCharacterController character;
-        
+
         private Vector3 _lookInputVector = Vector3.zero;
-        
+
+        private SirenInputActions _inputActions;
+
         private void Start()
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -21,29 +24,37 @@ namespace Siren.Scripts.Player
             // Ignore the character's collider(s) for camera obstruction checks
             orbitCamera.IgnoredColliders.Clear();
             orbitCamera.IgnoredColliders.AddRange(character.GetComponentsInChildren<Collider>());
+
+            _inputActions = new SirenInputActions();
+            _inputActions.Enable();
+            _inputActions.Player.Enable();
+            _inputActions.Player.Move.Enable();
+            _inputActions.Player.Look.Enable();
+            _inputActions.Player.Scroll.Enable();
+            _inputActions.Player.Focus.Enable();
         }
-        
+
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (_inputActions.Player.Focus.ReadValue<float>() > 0)
             {
                 Cursor.lockState = CursorLockMode.Locked;
             }
 
             HandleCharacterInput();
         }
-        
+
         private void LateUpdate()
         {
             HandleCameraInput();
         }
-        
+
         private void HandleCameraInput()
         {
             // Create the look input vector for the camera
-            var mouseLookAxisUp = Input.GetAxisRaw("Mouse Y");
-            var mouseLookAxisRight = Input.GetAxisRaw("Mouse X");
-            _lookInputVector = new Vector3(mouseLookAxisRight, mouseLookAxisUp, 0f);
+            var mouseLook = _inputActions.Player.Look.ReadValue<Vector2>() * 0.25f;
+
+            _lookInputVector = new Vector3(mouseLook.x, mouseLook.y, 0f);
 
             // Prevent moving the camera while the cursor isn't locked
             if (Cursor.lockState != CursorLockMode.Locked)
@@ -52,7 +63,11 @@ namespace Siren.Scripts.Player
             }
 
             // Input for zooming the camera (disabled in WebGL because it can cause problems)
-            var scrollInput = -Input.GetAxis("Mouse ScrollWheel");
+            // var scrollInput = -Input.GetAxis("Mouse ScrollWheel");
+            var scrollInput = -Mathf.Clamp(
+                _inputActions.Player.Scroll.ReadValue<Vector2>().y,
+                -0.25f, 0.25f
+            );
 #if UNITY_WEBGL
             scrollInput = 0f;
 #endif
@@ -61,18 +76,19 @@ namespace Siren.Scripts.Player
             orbitCamera.UpdateWithInput(Time.deltaTime, scrollInput, _lookInputVector);
 
             // Handle toggling zoom level
-            if (Input.GetMouseButtonDown(1))
-            {
-                orbitCamera.TargetDistance = (orbitCamera.TargetDistance == 0f) ? orbitCamera.DefaultDistance : 0f;
-            }
+            // if (Input.GetMouseButtonDown(1))
+            // {
+            //     orbitCamera.TargetDistance = (orbitCamera.TargetDistance == 0f) ? orbitCamera.DefaultDistance : 0f;
+            // }
         }
 
         private void HandleCharacterInput()
         {
+            var moveInput = _inputActions.Player.Move.ReadValue<Vector2>();
             var inputs = new PlayerCharacterInputs
             {
-                MoveAxisForward = Input.GetAxisRaw("Vertical"),
-                MoveAxisRight = Input.GetAxisRaw("Horizontal"),
+                MoveAxisForward = moveInput.y,
+                MoveAxisRight = moveInput.x,
                 CameraRotation = orbitCamera.transform.rotation
             };
 
