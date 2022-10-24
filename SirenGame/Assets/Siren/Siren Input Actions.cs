@@ -62,6 +62,15 @@ public partial class @SirenInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Value"",
+                    ""id"": ""57d48dda-5cd6-489d-b704-e26af41476c2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -174,6 +183,28 @@ public partial class @SirenInputActions : IInputActionCollection2, IDisposable
                     ""action"": ""Focus"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""516d2f56-a96e-4697-b732-dfa7f33ffd63"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e2722629-8b43-43f7-817e-084518b51c4d"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -214,6 +245,7 @@ public partial class @SirenInputActions : IInputActionCollection2, IDisposable
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Scroll = m_Player.FindAction("Scroll", throwIfNotFound: true);
         m_Player_Focus = m_Player.FindAction("Focus", throwIfNotFound: true);
+        m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -277,6 +309,7 @@ public partial class @SirenInputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_Scroll;
     private readonly InputAction m_Player_Focus;
+    private readonly InputAction m_Player_Jump;
     public struct PlayerActions
     {
         private @SirenInputActions m_Wrapper;
@@ -285,6 +318,7 @@ public partial class @SirenInputActions : IInputActionCollection2, IDisposable
         public InputAction @Look => m_Wrapper.m_Player_Look;
         public InputAction @Scroll => m_Wrapper.m_Player_Scroll;
         public InputAction @Focus => m_Wrapper.m_Player_Focus;
+        public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -306,6 +340,9 @@ public partial class @SirenInputActions : IInputActionCollection2, IDisposable
                 @Focus.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFocus;
                 @Focus.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFocus;
                 @Focus.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFocus;
+                @Jump.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
+                @Jump.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
+                @Jump.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -322,6 +359,9 @@ public partial class @SirenInputActions : IInputActionCollection2, IDisposable
                 @Focus.started += instance.OnFocus;
                 @Focus.performed += instance.OnFocus;
                 @Focus.canceled += instance.OnFocus;
+                @Jump.started += instance.OnJump;
+                @Jump.performed += instance.OnJump;
+                @Jump.canceled += instance.OnJump;
             }
         }
     }
@@ -350,5 +390,6 @@ public partial class @SirenInputActions : IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnScroll(InputAction.CallbackContext context);
         void OnFocus(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
     }
 }

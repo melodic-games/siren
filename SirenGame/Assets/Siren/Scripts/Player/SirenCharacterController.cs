@@ -8,6 +8,7 @@ namespace Siren.Scripts.Player
         public float MoveAxisForward;
         public float MoveAxisRight;
         public Quaternion CameraRotation;
+        public bool JumpDown;
     }
 
     public class SirenCharacterController : MonoBehaviour, ICharacterController
@@ -22,12 +23,22 @@ namespace Siren.Scripts.Player
         public float airAccelerationSpeed = 5f;
         public float drag = 0.1f;
 
-        [Header("Misc")] public bool rotationObstruction;
-        public Vector3 gravity = new(0, -30f, 0);
+        [Header("Jumping")] public bool allowJumpingWhenSliding;
+        public float jumpSpeed = 10f;
+        public float jumpPreGroundingGraceTime;
+        public float jumpPostGroundingGraceTime;
+
+        [Header("Misc")] public Vector3 gravity = new(0, -30f, 0);
         public Transform meshRoot;
 
         private Vector3 _moveInputVector;
         private Vector3 _lookInputVector;
+
+        private bool _jumpRequested;
+        private bool _jumpConsumed;
+        private bool _jumpThisFrame;
+        private float _timeSinceJumpRequested = Mathf.Infinity;
+        private float _timeSinceLastAbleToJump;
 
         private void Start()
         {
@@ -59,6 +70,13 @@ namespace Siren.Scripts.Player
             // move and look inputs
             _moveInputVector = cameraPlanarRotation * moveInputVector;
             _lookInputVector = cameraPlanarDirection;
+
+            // jumping input
+            if (inputs.JumpDown)
+            {
+                _timeSinceJumpRequested = 0f;
+                _jumpRequested = true;
+            }
         }
 
         public void BeforeCharacterUpdate(float deltaTime)
@@ -143,18 +161,85 @@ namespace Siren.Scripts.Player
 
                     currentVelocity += velocityDiff * airAccelerationSpeed * deltaTime;
                 }
-                
+
                 // gravity
                 currentVelocity += gravity * deltaTime;
-                
+
                 // drag
                 currentVelocity *= 1f / (1f + drag * deltaTime);
+            }
+
+            // handle jumping
+            _jumpThisFrame = false;
+            _timeSinceJumpRequested += deltaTime;
+            if (_jumpRequested)
+            {
+                // see if we actually are allowed to jump
+                var jumpingWhenSliding = allowJumpingWhenSliding
+                    ? motor.GroundingStatus.FoundAnyGround
+                    : motor.GroundingStatus.IsStableOnGround;
+
+                if (
+                    !_jumpConsumed && (
+                        jumpingWhenSliding ||
+                        _timeSinceLastAbleToJump <= jumpPostGroundingGraceTime
+                    )
+                )
+                {
+                    // calculate jump direction before ungrounding
+                    var jumpDirection = motor.CharacterUp;
+                    if (motor.GroundingStatus.FoundAnyGround && !motor.GroundingStatus.IsStableOnGround)
+                    {
+                        jumpDirection = motor.GroundingStatus.GroundNormal;
+                    }
+
+                    // makes the character skip ground probing/snapping on its next update.
+                    // if this line weren't here, the character would remain snapped to the ground
+                    motor.ForceUnground(0.1f);
+
+                    // add to the return velocity and reset jump state
+                    currentVelocity += jumpDirection * jumpSpeed - Vector3.Project(
+                        currentVelocity, motor.CharacterUp
+                    );
+
+                    _jumpRequested = false;
+                    _jumpConsumed = true;
+                    _jumpThisFrame = true;
+                }
             }
         }
 
         public void AfterCharacterUpdate(float deltaTime)
         {
             // This is called after the motor has finished everything in its update
+
+            // handle jump related values
+            {
+                // handle jumping pre-ground grace period
+                if (_jumpRequested && _timeSinceJumpRequested > jumpPreGroundingGraceTime)
+                {
+                    _jumpRequested = false;
+                }
+
+                // handle jumping while sliding
+                if (allowJumpingWhenSliding
+                        ? motor.GroundingStatus.FoundAnyGround
+                        : motor.GroundingStatus.IsStableOnGround)
+                {
+                    // if we're on a ground surface, reset jumping value
+                    if (!_jumpThisFrame)
+                    {
+                        _jumpConsumed = false;
+                    }
+
+                    _timeSinceLastAbleToJump = 0f;
+                }
+                else
+                {
+                    // keep track of time since we were last able to jump (for grace period)
+                    _timeSinceLastAbleToJump += deltaTime;
+                }
+            }
         }
 
         public bool IsColliderValidForCollisions(Collider coll)

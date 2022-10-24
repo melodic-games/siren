@@ -32,6 +32,7 @@ namespace Siren.Scripts.Player
             _inputActions.Player.Look.Enable();
             _inputActions.Player.Scroll.Enable();
             _inputActions.Player.Focus.Enable();
+            _inputActions.Player.Jump.Enable();
         }
 
         private void Update()
@@ -89,7 +90,8 @@ namespace Siren.Scripts.Player
             {
                 MoveAxisForward = moveInput.y,
                 MoveAxisRight = moveInput.x,
-                CameraRotation = orbitCamera.transform.rotation
+                CameraRotation = orbitCamera.transform.rotation,
+                JumpDown = _inputActions.Player.Jump.ReadValue<float>() > 0f
             };
 
             character.SetInputs(inputs);
