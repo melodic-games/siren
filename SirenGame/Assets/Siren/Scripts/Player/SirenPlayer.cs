@@ -20,8 +20,8 @@ namespace Siren.Scripts.Player
             orbitCamera.SetFollowTransform(cameraFollowPoint);
 
             // Ignore the character's collider(s) for camera obstruction checks
-            orbitCamera.IgnoredColliders.Clear();
-            orbitCamera.IgnoredColliders.AddRange(character.GetComponentsInChildren<Collider>());
+            orbitCamera.ignoredColliders.Clear();
+            orbitCamera.ignoredColliders.AddRange(character.GetComponentsInChildren<Collider>());
 
             _inputActions = new SirenInputActions();
             _inputActions.Enable();
