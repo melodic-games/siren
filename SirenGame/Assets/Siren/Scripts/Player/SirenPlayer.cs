@@ -1,12 +1,10 @@
-﻿using KinematicCharacterController.Examples;
-using UnityEngine;
-using UnityEngine.InputSystem.Controls;
+﻿using UnityEngine;
 
 namespace Siren.Scripts.Player
 {
     public class SirenPlayer : MonoBehaviour
     {
-        public ExampleCharacterCamera orbitCamera;
+        public SirenCharacterCamera orbitCamera;
         public Transform cameraFollowPoint;
         public SirenCharacterController character;
 
@@ -53,7 +51,7 @@ namespace Siren.Scripts.Player
         private void HandleCameraInput()
         {
             // Create the look input vector for the camera
-            var mouseLook = _inputActions.Player.Look.ReadValue<Vector2>() * 0.25f;
+            var mouseLook = _inputActions.Player.Look.ReadValue<Vector2>() * 0.1f;
 
             _lookInputVector = new Vector3(mouseLook.x, mouseLook.y, 0f);
 

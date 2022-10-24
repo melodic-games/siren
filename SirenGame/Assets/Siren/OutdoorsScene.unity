@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2160.373, g: 2264.0508, b: 3286.6992, a: 1}
+  m_IndirectSpecularColor: {r: 2161.3838, g: 2265.3848, b: 3288.539, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1082,7 +1082,10 @@ MonoBehaviour:
   maxAirMoveSpeed: 10
   airAccelerationSpeed: 5
   drag: 0.1
-  rotationObstruction: 0
+  allowJumpingWhenSliding: 0
+  jumpSpeed: 10
+  jumpPreGroundingGraceTime: 0
+  jumpPostGroundingGraceTime: 0
   gravity: {x: 0, y: -30, z: 0}
   meshRoot: {fileID: 0}
 --- !u!1 &549901083
@@ -3957,7 +3960,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1823688464}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24092a40b02616e479baeb940325e339, type: 3}
+  m_Script: {fileID: 11500000, guid: 5486e05c589075441808401e58e0282c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Camera: {fileID: 1823688466}
@@ -4171,7 +4174,7 @@ Transform:
   m_GameObject: {fileID: 1851602211}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 16, y: 16, z: 16}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
