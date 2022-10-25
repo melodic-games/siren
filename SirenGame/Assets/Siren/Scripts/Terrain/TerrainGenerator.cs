@@ -1,7 +1,6 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Serialization;
 
 namespace Siren.Scripts.Terrain
 {
@@ -48,6 +47,8 @@ namespace Siren.Scripts.Terrain
             // var terrainOffset = Vector3.zero;
 
             var vertices = new Vector3[(terrainResolution + 1) * (terrainResolution + 1)];
+            var uv = new Vector2[(terrainResolution + 1) * (terrainResolution + 1)];
+
             var triangles = new int[terrainResolution * terrainResolution * 6];
 
             for (var z = 0; z < terrainResolution + 1; z++)
@@ -62,6 +63,7 @@ namespace Siren.Scripts.Terrain
                     );
 
                     vertices[i] = new Vector3(x * squareSize, noise, z * squareSize) - terrainOffset;
+                    uv[i] = new Vector2((float) x / terrainResolution, (float) z / terrainResolution);
 
                     if (x < terrainResolution && z < terrainResolution)
                     {
@@ -81,6 +83,7 @@ namespace Siren.Scripts.Terrain
                 name = "Siren Generated Terrain",
                 indexFormat = IndexFormat.UInt32,
                 vertices = vertices,
+                uv = uv,
                 triangles = triangles,
             };
 
@@ -97,13 +100,13 @@ namespace Siren.Scripts.Terrain
             EditorGUILayout.Separator();
 
             var terrainGenerator = (TerrainGenerator) target;
-            
+
             terrainGenerator.terrainResolution =
                 EditorGUILayout.IntSlider("Terrain Resolution", terrainGenerator.terrainResolution, 128, 1024);
 
             terrainGenerator.terrainSize =
-                EditorGUILayout.Slider("Terrain Size", terrainGenerator.terrainSize, 100f, 1000f);   
-            
+                EditorGUILayout.Slider("Terrain Size", terrainGenerator.terrainSize, 100f, 1000f);
+
             terrainGenerator.noiseSize =
                 EditorGUILayout.Slider("Noise Size", terrainGenerator.noiseSize, 1f, 100f);
 
