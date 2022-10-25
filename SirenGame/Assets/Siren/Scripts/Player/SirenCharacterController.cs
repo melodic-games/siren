@@ -11,6 +11,7 @@ namespace Siren.Scripts.Player
         public bool JumpDown;
     }
 
+    [SelectionBase]
     public class SirenCharacterController : MonoBehaviour, ICharacterController
     {
         public KinematicCharacterMotor motor;
