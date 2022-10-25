@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 
 namespace Siren.Scripts.Terrain
 {
@@ -9,8 +10,10 @@ namespace Siren.Scripts.Terrain
     [RequireComponent(typeof(MeshCollider))]
     public class TerrainGenerator : MonoBehaviour
     {
-        public float squareSize = 1f;
-        public int terrainSquares = 16;
+        public int terrainResolution = 128;
+        public float terrainSize = 100f;
+        public float noiseSize = 1f;
+        public float noiseHeight = 1f;
     }
 
 #if UNITY_EDITOR
@@ -24,49 +27,51 @@ namespace Siren.Scripts.Terrain
 
         private float GetNoise(float x, float z)
         {
-            return Mathf.PerlinNoise(x * 0.1f + 1290f, z * 0.1f + 1092f) * 10f;
+            var terrainGenerator = (TerrainGenerator) target;
+
+            return Mathf.PerlinNoise(
+                x * (1 / terrainGenerator.noiseSize) + 1290f,
+                z * (1 / terrainGenerator.noiseSize) + 1092f
+            ) * terrainGenerator.noiseHeight;
         }
 
         private void GenerateTerrain()
         {
             var terrainGenerator = (TerrainGenerator) target;
-            var squareSize = terrainGenerator.squareSize;
-            var terrainSquares = terrainGenerator.terrainSquares;
+            var terrainResolution = terrainGenerator.terrainResolution;
+            var terrainSize = terrainGenerator.terrainSize;
+            var squareSize = terrainSize / terrainResolution;
 
             var terrainOffset =
-                new Vector3(terrainSquares * squareSize / 2, 0, terrainSquares * squareSize / 2);
+                new Vector3(terrainSize * 0.5f, 0, terrainSize * 0.5f);
 
             // var terrainOffset = Vector3.zero;
 
-            var vertices = new Vector3[(terrainSquares + 1) * (terrainSquares + 1)];
-            var triangles = new int[terrainSquares * terrainSquares * 6];
+            var vertices = new Vector3[(terrainResolution + 1) * (terrainResolution + 1)];
+            var triangles = new int[terrainResolution * terrainResolution * 6];
 
-            var invSquareSize = 1f / squareSize;
-
-            for (var z = 0; z < terrainSquares + 1; z++)
+            for (var z = 0; z < terrainResolution + 1; z++)
             {
-                for (var x = 0; x < terrainSquares + 1; x++)
+                for (var x = 0; x < terrainResolution + 1; x++)
                 {
-                    var i = GetIndex(x, z, terrainSquares + 1);
+                    var i = GetIndex(x, z, terrainResolution + 1);
 
                     var noise = GetNoise(
                         x * squareSize - terrainOffset.x,
                         z * squareSize - terrainOffset.z
-                    ) * invSquareSize;
-                    
-                    // var noise = 0f;
+                    );
 
-                    vertices[i] = new Vector3(x, noise, z) * squareSize - terrainOffset;
+                    vertices[i] = new Vector3(x * squareSize, noise, z * squareSize) - terrainOffset;
 
-                    if (x < terrainSquares && z < terrainSquares)
+                    if (x < terrainResolution && z < terrainResolution)
                     {
-                        var triI = GetIndex(x, z, terrainSquares);
-                        triangles[triI * 6 + 0] = GetIndex(x + 0, z + 0, terrainSquares + 1);
-                        triangles[triI * 6 + 1] = GetIndex(x + 0, z + 1, terrainSquares + 1);
-                        triangles[triI * 6 + 2] = GetIndex(x + 1, z + 1, terrainSquares + 1);
-                        triangles[triI * 6 + 3] = GetIndex(x + 1, z + 1, terrainSquares + 1);
-                        triangles[triI * 6 + 4] = GetIndex(x + 1, z + 0, terrainSquares + 1);
-                        triangles[triI * 6 + 5] = GetIndex(x + 0, z + 0, terrainSquares + 1);
+                        var triI = GetIndex(x, z, terrainResolution);
+                        triangles[triI * 6 + 0] = GetIndex(x + 0, z + 0, terrainResolution + 1);
+                        triangles[triI * 6 + 1] = GetIndex(x + 0, z + 1, terrainResolution + 1);
+                        triangles[triI * 6 + 2] = GetIndex(x + 1, z + 1, terrainResolution + 1);
+                        triangles[triI * 6 + 3] = GetIndex(x + 1, z + 1, terrainResolution + 1);
+                        triangles[triI * 6 + 4] = GetIndex(x + 1, z + 0, terrainResolution + 1);
+                        triangles[triI * 6 + 5] = GetIndex(x + 0, z + 0, terrainResolution + 1);
                     }
                 }
             }
@@ -92,12 +97,19 @@ namespace Siren.Scripts.Terrain
             EditorGUILayout.Separator();
 
             var terrainGenerator = (TerrainGenerator) target;
+            
+            terrainGenerator.terrainResolution =
+                EditorGUILayout.IntSlider("Terrain Resolution", terrainGenerator.terrainResolution, 128, 1024);
 
-            terrainGenerator.squareSize =
-                EditorGUILayout.Slider("Square size", terrainGenerator.squareSize, 0f, 1f);
+            terrainGenerator.terrainSize =
+                EditorGUILayout.Slider("Terrain Size", terrainGenerator.terrainSize, 100f, 1000f);   
+            
+            terrainGenerator.noiseSize =
+                EditorGUILayout.Slider("Noise Size", terrainGenerator.noiseSize, 1f, 100f);
 
-            terrainGenerator.terrainSquares =
-                EditorGUILayout.IntSlider("Terrain squares", terrainGenerator.terrainSquares, 0, 2048);
+            terrainGenerator.noiseHeight =
+                EditorGUILayout.Slider("Noise Height", terrainGenerator.noiseHeight, 0.1f, 100f);
+
 
             if (GUILayout.Button("Generate terrain"))
             {
