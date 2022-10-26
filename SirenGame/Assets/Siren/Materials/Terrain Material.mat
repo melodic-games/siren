@@ -29,9 +29,11 @@ Material:
   m_ValidKeywords:
   - _DISABLE_SSR_TRANSPARENT
   m_InvalidKeywords:
-  - _NORMALMAP_TANGENT_SPACE
+  - _MATERIAL_AFFECTS_ALBEDO
+  - _MATERIAL_AFFECTS_MASKMAP
+  - _MATERIAL_AFFECTS_NORMAL
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 2225
   stringTagMap:
@@ -71,6 +73,18 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _EmissiveColorMap:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GetSandShaderCustomFunction_28950a83ab12426abfdb9bfd0049450e_New_8:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GetSandShaderCustomFunction_28950a83ab12426abfdb9bfd0049450e_SandShallowTexture_8:
+        m_Texture: {fileID: 2800000, guid: 0a4db46a603cdb948be554ac81ff5f20, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GetSandShaderCustomFunction_28950a83ab12426abfdb9bfd0049450e_SandSteepTexture_9:
+        m_Texture: {fileID: 2800000, guid: afc0e46bbdadd5146aa31828adde6dff, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _HeightMap:
@@ -175,6 +189,10 @@ Material:
     - _AORemapMin: 0
     - _ATDistance: 1
     - _AddPrecomputedVelocity: 0
+    - _AffectAlbedo: 1
+    - _AffectMetal: 1
+    - _AffectNormal: 1
+    - _AffectSmoothness: 1
     - _AlbedoAffectEmissive: 0
     - _AlphaCutoff: 0.5
     - _AlphaCutoffEnable: 0
@@ -192,6 +210,15 @@ Material:
     - _CullMode: 2
     - _CullModeForward: 2
     - _Cutoff: 0.5
+    - _DecalColorMask0: 15
+    - _DecalColorMask1: 15
+    - _DecalColorMask2: 11
+    - _DecalColorMask3: 8
+    - _DecalMeshBiasType: 0
+    - _DecalMeshDepthBias: 0
+    - _DecalMeshViewBias: 0
+    - _DecalStencilRef: 16
+    - _DecalStencilWriteMask: 16
     - _DepthOffsetEnable: 0
     - _DetailAlbedoScale: 1
     - _DetailNormalScale: 1
@@ -204,6 +231,7 @@ Material:
     - _DoubleSidedEnable: 0
     - _DoubleSidedGIMode: 0
     - _DoubleSidedNormalMode: 1
+    - _DrawOrder: 0
     - _DstBlend: 0
     - _EmissiveColorMode: 1
     - _EmissiveExposureWeight: 1
@@ -213,9 +241,12 @@ Material:
     - _EnableFogOnTransparent: 1
     - _EnableGeometricSpecularAA: 0
     - _EnergyConservingSpecularColor: 1
+    - _GlitterSize: 64
+    - _GlitterThreshold: 0
     - _GrainIntensity: 1.5
-    - _GrainSize: 32
-    - _GrainStrength: 0.1
+    - _GrainSize: 8
+    - _GrainStrength: 0.15
+    - _GrainStrength_1: 1.5
     - _HeightAmplitude: 0.02
     - _HeightCenter: 0.5
     - _HeightMapParametrization: 0
@@ -236,6 +267,10 @@ Material:
     - _MetallicRemapMin: 0
     - _NormalMapSpace: 0
     - _NormalScale: 1
+    - _OceanPower: 0
+    - _OceanSpecularPower: 128
+    - _OceanSpecularStrength: 0.2
+    - _OceanStrength: 0
     - _OpaqueCullMode: 2
     - _PPDLodThreshold: 5
     - _PPDMaxSamples: 15
@@ -248,10 +283,10 @@ Material:
     - _RefractionModel: 0
     - _RenderQueueType: 1
     - _RequireSplitLighting: 0
-    - _RimPower: 9.72
-    - _RimStrength: 1.81
-    - _RippleStrength: 0.563
-    - _RipplesSize: 0.062
+    - _RimPower: 10
+    - _RimStrength: 1
+    - _RippleStrength: 1
+    - _RipplesSize: 150
     - _RipplesSteepnessPower: 1
     - _SandSize: 32
     - _SandStrength: 0.3
@@ -296,6 +331,7 @@ Material:
     - _ZTestGBuffer: 4
     - _ZTestTransparent: 4
     - _ZWrite: 1
+    - c: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 0, b: 0, a: 1}
     - _BaseColorMap_MipInfo: {r: 0, g: 0, b: 0, a: 0}
@@ -305,10 +341,14 @@ Material:
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _EmissiveColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissiveColorLDR: {r: 0, g: 0, b: 0, a: 1}
+    - _GlitterColor: {r: 1, g: 1, b: 1, a: 0}
     - _InvPrimScale: {r: 1, g: 1, b: 0, a: 0}
     - _IridescenceThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
+    - _OceanColor: {r: 0, g: 0, b: 0, a: 0}
+    - _OceanSpecularColor: {r: 1, g: 0.74171203, b: 0.5801887, a: 0}
     - _RimColor: {r: 1, g: 0.4393837, b: 0.109803915, a: 0}
-    - _ShadowColor: {r: 0.95, g: 0, b: 0, a: 0}
+    - _SandColor: {r: 1, g: 1, b: 1, a: 0}
+    - _ShadowColor: {r: 1, g: 0, b: 0, a: 0}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _TerrainColor: {r: 1, g: 0, b: 0, a: 0}
     - _ThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
