@@ -213,8 +213,9 @@ Material:
     - _EnableFogOnTransparent: 1
     - _EnableGeometricSpecularAA: 0
     - _EnergyConservingSpecularColor: 1
-    - _GrainSize: 38.81
-    - _GrainStrength: 0.15
+    - _GrainIntensity: 1.5
+    - _GrainSize: 32
+    - _GrainStrength: 0.1
     - _HeightAmplitude: 0.02
     - _HeightCenter: 0.5
     - _HeightMapParametrization: 0
@@ -247,6 +248,8 @@ Material:
     - _RefractionModel: 0
     - _RenderQueueType: 1
     - _RequireSplitLighting: 0
+    - _RimPower: 9.72
+    - _RimStrength: 1.81
     - _RippleStrength: 0.563
     - _RipplesSize: 0.062
     - _RipplesSteepnessPower: 1
@@ -304,7 +307,10 @@ Material:
     - _EmissiveColorLDR: {r: 0, g: 0, b: 0, a: 1}
     - _InvPrimScale: {r: 1, g: 1, b: 0, a: 0}
     - _IridescenceThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
+    - _RimColor: {r: 1, g: 0.4393837, b: 0.109803915, a: 0}
+    - _ShadowColor: {r: 0.95, g: 0, b: 0, a: 0}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
+    - _TerrainColor: {r: 1, g: 0, b: 0, a: 0}
     - _ThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _TransmittanceColor: {r: 1, g: 1, b: 1, a: 1}
     - _UVDetailsMappingMask: {r: 1, g: 0, b: 0, a: 0}
