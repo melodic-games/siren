@@ -4,13 +4,14 @@ using UnityEngine;
 
 namespace Siren.Scripts.Terrain
 {
+    // [ExecuteInEditMode]
     public class InfiniteTerrain : MonoBehaviour
     {
         [Header("General")] public int viewDistance = 4;
         public Transform playerCharacterTransform;
         public Material terrainMaterial;
 
-        [Header("Generation")] [Range(64f, 512f)]
+        [Header("Generation"), Range(64f, 512f)]
         public int chunkSize = 500;
 
         [Range(100, 254)] public int chunkResolution = 254;
@@ -25,8 +26,8 @@ namespace Siren.Scripts.Terrain
         private Thread _meshGenThread;
         private bool _externalThreadRunning = true;
 
-        private const float ChunkMainThreadUpdateTimeout = 0.05f;
-        private float _chunkMainThreadUpdateTimer = ChunkMainThreadUpdateTimeout;
+        // private const float ChunkMainThreadUpdateTimeout = 0.05f;
+        // private float _chunkMainThreadUpdateTimer = ChunkMainThreadUpdateTimeout;
 
         private void Start()
         {
@@ -41,6 +42,26 @@ namespace Siren.Scripts.Terrain
             {
                 _meshGenThread.Join();
             }
+
+            DeleteAllChunks();
+        }
+
+        private void DeleteAllChunks()
+        {
+            lock (_chunksLock)
+            {
+                foreach (var chunk in _chunks.Values)
+                {
+                    Destroy(chunk.gameObject);
+                }
+                _chunks.Clear();
+            }
+        }
+
+        private void OnValidate()
+        {
+            // when parameters change
+            DeleteAllChunks();
         }
 
         private void SetThreadSafeChunk(Vector2Int position, InfiniteTerrainChunk chunk)
@@ -61,7 +82,11 @@ namespace Siren.Scripts.Terrain
 
         private Vector2Int GetPlayerChunkPosition()
         {
+#if UNITY_EDITOR
+            var playerPos = Camera.main.transform.position;
+#else
             var playerPos = playerCharacterTransform.position;
+#endif
             return new Vector2Int(
                 Mathf.FloorToInt(playerPos.x / chunkSize),
                 Mathf.FloorToInt(playerPos.z / chunkSize)
@@ -103,7 +128,9 @@ namespace Siren.Scripts.Terrain
                 {
                     position = new Vector3(chunkPosition.x * chunkSize, 0, chunkPosition.y * chunkSize),
                     parent = transform
-                }
+                },
+                // TODO: only doing this for performance reasons, remove somehow
+                hideFlags = HideFlags.HideAndDontSave
             };
 
             var infiniteTerrainChunk = chunk.AddComponent<InfiniteTerrainChunk>();
@@ -143,15 +170,16 @@ namespace Siren.Scripts.Terrain
 
         public void Update()
         {
-            // TODO: handle changes to parameters by regenerating all chunks
-
+            // TODO: make sure its really rendering the ones closest to the player first
+            
             var playerChunkPosition = GetPlayerChunkPosition();
             _lastPlayerPosition = playerChunkPosition;
 
             // search around player with view distance
             var chunkPositionsRequired = GetSpiralChunkPositionsAroundPlayer(playerChunkPosition);
 
-            var canUpdateOneChunk = _chunkMainThreadUpdateTimer >= ChunkMainThreadUpdateTimeout;
+            // var canUpdateOneChunk = _chunkMainThreadUpdateTimer >= ChunkMainThreadUpdateTimeout;
+            var canUpdateOneChunk = true;
 
             foreach (var chunkPosition in chunkPositionsRequired)
             {
@@ -162,7 +190,7 @@ namespace Siren.Scripts.Terrain
                     if (canUpdateOneChunk && chunk.status is ChunkStatus.GotMeshGen or ChunkStatus.GotPhysicsBake)
                     {
                         chunk.DoMainThreadWork();
-                        _chunkMainThreadUpdateTimer -= ChunkMainThreadUpdateTimeout;
+                        // _chunkMainThreadUpdateTimer -= ChunkMainThreadUpdateTimeout;
                         canUpdateOneChunk = false;
                     }
                 }
@@ -174,8 +202,9 @@ namespace Siren.Scripts.Terrain
                 }
             }
 
-            // TODO: time scale affects this value which is probably an unintended side effects
-            _chunkMainThreadUpdateTimer += Time.deltaTime;
+            // nevermind.. time scale affects this value which is probably an unintended side effects
+            // _chunkMainThreadUpdateTimer += Time.deltaTime;
+            // Debug.Log(_chunkMainThreadUpdateTimer);
 
             // TODO: remove chunks not required
         }

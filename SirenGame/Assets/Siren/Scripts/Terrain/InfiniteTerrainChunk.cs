@@ -23,9 +23,9 @@ namespace Siren.Scripts.Terrain
         public InfiniteTerrain infiniteTerrain;
         public Vector2Int chunkPosition;
 
-        private MeshFilter _meshFilter;
-        private MeshRenderer _meshRenderer;
-        private MeshCollider _meshCollider;
+        // private MeshFilter _meshFilter;
+        // private MeshRenderer _meshRenderer;
+        // private MeshCollider _meshCollider;
 
         private (Vector3[], int[]) _meshData;
         private Mesh _mesh;
@@ -38,9 +38,7 @@ namespace Siren.Scripts.Terrain
 
         private void Awake()
         {
-            _meshFilter = GetComponent<MeshFilter>();
-            _meshRenderer = GetComponent<MeshRenderer>();
-            _meshCollider = GetComponent<MeshCollider>();
+            
         }
 
         private float GetNoise(float x, float z)
@@ -159,11 +157,11 @@ namespace Siren.Scripts.Terrain
         private void PushMeshes()
         {
             Profiler.BeginSample("Chunk PushMeshes");
+            
+            GetComponent<MeshRenderer>().material = infiniteTerrain.terrainMaterial;
 
-            _meshRenderer.material = infiniteTerrain.terrainMaterial;
-
-            _meshFilter.sharedMesh = _mesh;
-            _meshCollider.sharedMesh = _physicsMesh;
+            GetComponent<MeshFilter>().sharedMesh = _mesh;
+            GetComponent<MeshCollider>().sharedMesh = _physicsMesh;
 
             Profiler.EndSample();
         }
