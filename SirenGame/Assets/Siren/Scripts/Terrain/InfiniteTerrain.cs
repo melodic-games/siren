@@ -2,13 +2,14 @@
 using System.Linq;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Siren.Scripts.Terrain
 {
     // [ExecuteInEditMode]
     public class InfiniteTerrain : MonoBehaviour
     {
-        [Header("General")] public int viewDistance = 4;
+        [Header("General"), Range(1, 32f)] public int viewDistance = 4;
         public Transform playerCharacterTransform;
         public Material terrainMaterial;
 
@@ -18,6 +19,8 @@ namespace Siren.Scripts.Terrain
         [Range(100, 254)] public int chunkResolution = 254;
         [Range(0.01f, 0.001f)] public float noiseSize = 0.005f;
         [Range(0.1f, 100f)] public float noiseHeight = 10;
+
+        [Header("Area Modifiers")] public InfiniteTerrainAreaModifier[] areaModifiers;
 
         private readonly Dictionary<Vector2Int, InfiniteTerrainChunk> _chunks = new();
         private readonly Object _chunksLock = new();
@@ -59,7 +62,7 @@ namespace Siren.Scripts.Terrain
             DeleteAllChunks();
         }
 
-        private void DeleteAllChunks()
+        public void DeleteAllChunks()
         {
             lock (_chunksLock)
             {
@@ -76,7 +79,26 @@ namespace Siren.Scripts.Terrain
         {
             // when parameters change
             _lastPlayerPosition = new Vector2Int(999, 999);
+
             DeleteAllChunks();
+
+            // TODO: actually make this work so we can mark chunks dirty
+            // currently, external thread might be busy generating whilst this gets set
+
+            // lock (_chunksLock)
+            // {
+            //     foreach (var chunk in _chunks.Values)
+            //     {
+            //         chunk.status = ChunkStatus.NeedMeshGen;
+            //     }
+            // }
+        }
+
+        public InfiniteTerrainAreaModifier[] GetAreaModifiersInBounds(Bounds bounds)
+        {
+            return areaModifiers
+                .Where(m => m.GetBounds().Intersects(bounds))
+                .ToArray();
         }
 
         private void SetThreadSafeChunk(Vector2Int position, InfiniteTerrainChunk chunk)
@@ -133,9 +155,9 @@ namespace Siren.Scripts.Terrain
         private InfiniteTerrainChunk CreateChunkGameObject(Vector2Int chunkPosition)
         {
             var position = new Vector3(
-                chunkPosition.x * chunkSize - chunkSize / 2,
+                chunkPosition.x * chunkSize,
                 0,
-                chunkPosition.y * chunkSize - chunkSize / 2
+                chunkPosition.y * chunkSize
             );
 
             var chunk = new GameObject

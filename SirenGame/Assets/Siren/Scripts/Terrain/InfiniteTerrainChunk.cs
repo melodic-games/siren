@@ -1,4 +1,6 @@
 ﻿using System;
+using Siren.Scripts.UI;
+using Siren.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
@@ -31,17 +33,24 @@ namespace Siren.Scripts.Terrain
         public bool doingExternalThreadWork;
         public ChunkStatus status = ChunkStatus.NeedMeshGen;
 
-        private float GetNoise(float x, float z)
+        // private Bounds _bounds;
+        //
+        // private void OnDrawGizmosSelected()
+        // {
+        //     GizmoUtils.DrawBounds(_bounds);
+        // }
+
+        private float GetNoise(float x, float z, float noiseSize, float noiseHeight)
         {
             x += chunkPosition.x * infiniteTerrain.chunkSize;
             z += chunkPosition.y * infiniteTerrain.chunkSize;
 
             return (
                 Mathf.PerlinNoise(
-                    x * infiniteTerrain.noiseSize + 1290f,
-                    z * infiniteTerrain.noiseSize + 1092f
+                    x * noiseSize + 1290f,
+                    z * noiseSize + 1092f
                 ) * 2 - 1
-            ) * infiniteTerrain.noiseHeight;
+            ) * noiseHeight;
         }
 
         private (Vector3[], int[], Vector2[]) GenerateMeshData(int chunkResolution)
@@ -49,20 +58,89 @@ namespace Siren.Scripts.Terrain
             Profiler.BeginSample("Chunk GenerateMeshData");
 
             var chunkSize = infiniteTerrain.chunkSize;
+            var halfAChunk = chunkSize / 2;
 
             var vertices = new Vector3[(chunkResolution + 1) * (chunkResolution + 1)];
             var uv = new Vector2[(chunkResolution + 1) * (chunkResolution + 1)];
 
             var squareSize = chunkSize / (float) chunkResolution;
 
+            var chunkWorldPosition = new Vector3(
+                (float) chunkPosition.x * infiniteTerrain.chunkSize,
+                0,
+                (float) chunkPosition.y * infiniteTerrain.chunkSize
+            );
+
+            var bounds = new Bounds(
+                chunkWorldPosition,
+                new Vector3(chunkSize, 999, chunkSize)
+            );
+
+            var areaModifiers = infiniteTerrain.GetAreaModifiersInBounds(bounds);
+
             var i = 0;
             for (var z = 0; z <= chunkResolution; z++)
             {
                 for (var x = 0; x <= chunkResolution; x++)
                 {
-                    var y = GetNoise(x * squareSize, z * squareSize);
-                    vertices[i] = new Vector3(x * squareSize, y, z * squareSize);
+                    var worldPosition = chunkWorldPosition + new Vector3(
+                        x * squareSize - halfAChunk,
+                        0,
+                        z * squareSize - halfAChunk
+                    );
+
+                    var y = GetNoise(
+                        x * squareSize,
+                        z * squareSize,
+                        infiniteTerrain.noiseSize,
+                        infiniteTerrain.noiseHeight
+                    );
+
+
+                    if (areaModifiers.Length > 0)
+                    {
+                        var modifier = areaModifiers[0];
+
+                        var distance = modifier.DistanceFrom(worldPosition);
+                        var totalRadius = modifier.radius + modifier.falloff;
+
+                        if (distance < totalRadius)
+                        {
+                            // we're in radius + falloff
+
+                            var modifierY = GetNoise(
+                                x * squareSize,
+                                z * squareSize,
+                                modifier.noiseSize,
+                                modifier.noiseHeight
+                            );
+
+                            if (distance < modifier.radius)
+                            {
+                                // in radius
+                                y = modifierY;
+                            }
+                            else
+                            {
+                                // in falloff
+                                var t = Mathf.InverseLerp(modifier.radius, totalRadius, distance);
+                                y = Mathf.Lerp(
+                                    modifierY,
+                                    y,
+                                    EasingFunctions.Ease(t, EasingFunctions.Easing.InOutSine)
+                                );
+                            }
+                        }
+                    }
+
+                    vertices[i] = new Vector3(
+                        x * squareSize - halfAChunk,
+                        y,
+                        z * squareSize - halfAChunk
+                    );
+
                     uv[i] = new Vector2((float) x / chunkResolution, (float) z / chunkResolution);
+
                     i++;
                 }
             }

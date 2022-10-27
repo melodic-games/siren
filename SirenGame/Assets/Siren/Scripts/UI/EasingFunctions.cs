@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Tivoli.Scripts.UI
+namespace Siren.Scripts.UI
 {
     public static class EasingFunctions
     {

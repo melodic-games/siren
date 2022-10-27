@@ -1,6 +1,9 @@
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Siren.Scripts.Terrain
 {
@@ -17,7 +20,7 @@ namespace Siren.Scripts.Terrain
 
 #if UNITY_EDITOR
     [CustomEditor(typeof(TerrainGenerator))]
-    public class TerrainGeneratorEditor : Editor
+    public class TerrainGeneratorEditor : UnityEditor.Editor
     {
         private static int GetIndex(int x, int z, int width)
         {
