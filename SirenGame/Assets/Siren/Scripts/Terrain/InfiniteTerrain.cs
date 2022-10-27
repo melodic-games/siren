@@ -18,30 +18,44 @@ namespace Siren.Scripts.Terrain
         [Range(0.1f, 100f)] public float noiseHeight = 10;
 
         private readonly Dictionary<Vector2Int, InfiniteTerrainChunk> _chunks = new();
+        private readonly Object _chunksLock = new();
 
-        // private Vector2Int _lastPlayerPosition = new(999, 999);
+        private Vector2Int _lastPlayerPosition = new(999, 999);
 
         private Thread _meshGenThread;
-        private bool _meshGenThreadRunning = true;
+        private bool _externalThreadRunning = true;
 
-        private readonly Queue<InfiniteTerrainChunk> _chunksToMeshGen = new();
-        private readonly Object _chunksToMeshGenLock = new();
-
-        private const float ChunkUpdateMeshTimeout = 0.05f;
-        private float _chunkUpdateMeshTimer = ChunkUpdateMeshTimeout;
+        private const float ChunkMainThreadUpdateTimeout = 0.05f;
+        private float _chunkMainThreadUpdateTimer = ChunkMainThreadUpdateTimeout;
 
         private void Start()
         {
-            _meshGenThread = new Thread(MeshGenThread);
+            _meshGenThread = new Thread(ExternalThread);
             _meshGenThread.Start();
         }
 
         private void OnDestroy()
         {
-            _meshGenThreadRunning = false;
+            _externalThreadRunning = false;
             if (_meshGenThread.IsAlive)
             {
                 _meshGenThread.Join();
+            }
+        }
+
+        private void SetThreadSafeChunk(Vector2Int position, InfiniteTerrainChunk chunk)
+        {
+            lock (_chunksLock)
+            {
+                _chunks[position] = chunk;
+            }
+        }
+
+        private InfiniteTerrainChunk GetThreadSafeChunk(Vector2Int position)
+        {
+            lock (_chunksLock)
+            {
+                return _chunks.TryGetValue(position, out var chunk) ? chunk : null;
             }
         }
 
@@ -99,19 +113,31 @@ namespace Siren.Scripts.Terrain
             return infiniteTerrainChunk;
         }
 
-        private void MeshGenThread()
+        private void ExternalThread()
         {
-            while (_meshGenThreadRunning)
+            while (_externalThreadRunning)
             {
-                InfiniteTerrainChunk chunkToMeshGen;
+                // find closest chunk that needs work
 
-                lock (_chunksToMeshGenLock)
+                var playerChunkPosition = _lastPlayerPosition;
+                var chunkPositions = GetSpiralChunkPositionsAroundPlayer(playerChunkPosition);
+
+                InfiniteTerrainChunk chunk = null;
+
+                foreach (var position in chunkPositions)
                 {
-                    if (_chunksToMeshGen.Count == 0) continue;
-                    chunkToMeshGen = _chunksToMeshGen.Dequeue();
+                    var queryChunk = GetThreadSafeChunk(position.Item1);
+                    if (
+                        queryChunk == null ||
+                        queryChunk.status is not (ChunkStatus.NeedMeshGen or ChunkStatus.NeedPhysicsBake)
+                    ) continue;
+                    chunk = queryChunk;
+                    break;
                 }
 
-                chunkToMeshGen.GenerateAllMeshData();
+                if (chunk == null) continue;
+
+                chunk.DoExternalThreadWork();
             }
         }
 
@@ -120,41 +146,36 @@ namespace Siren.Scripts.Terrain
             // TODO: handle changes to parameters by regenerating all chunks
 
             var playerChunkPosition = GetPlayerChunkPosition();
-            // if (playerChunkPosition == _lastPlayerPosition) return;
-            // _lastPlayerPosition = playerChunkPosition;
+            _lastPlayerPosition = playerChunkPosition;
 
             // search around player with view distance
             var chunkPositionsRequired = GetSpiralChunkPositionsAroundPlayer(playerChunkPosition);
 
-            var canUpdateOneChunkMesh = _chunkUpdateMeshTimer >= ChunkUpdateMeshTimeout;
+            var canUpdateOneChunk = _chunkMainThreadUpdateTimer >= ChunkMainThreadUpdateTimeout;
 
             foreach (var chunkPosition in chunkPositionsRequired)
             {
-                if (_chunks.TryGetValue(chunkPosition.Item1, out var chunk))
+                var chunk = GetThreadSafeChunk(chunkPosition.Item1);
+                if (chunk != null)
                 {
                     // if thread generated mesh data but it's not been applied yet (has to be done in main thread)
-                    if (canUpdateOneChunkMesh && chunk.allMeshDataGenerated && chunk.allMeshDataApplied == false)
+                    if (canUpdateOneChunk && chunk.status is ChunkStatus.GotMeshGen or ChunkStatus.GotPhysicsBake)
                     {
-                        // update mesh and reset timer
-                        chunk.UpdateGameObjectMesh();
-                        _chunkUpdateMeshTimer -= ChunkUpdateMeshTimeout;
-                        canUpdateOneChunkMesh = false;
+                        chunk.DoMainThreadWork();
+                        _chunkMainThreadUpdateTimer -= ChunkMainThreadUpdateTimeout;
+                        canUpdateOneChunk = false;
                     }
                 }
                 else
                 {
                     // make a chunk
                     chunk = CreateChunkGameObject(chunkPosition.Item1);
-                    _chunks[chunkPosition.Item1] = chunk;
-
-                    lock (_chunksToMeshGenLock)
-                    {
-                        _chunksToMeshGen.Enqueue(chunk);
-                    }
+                    SetThreadSafeChunk(chunkPosition.Item1, chunk);
                 }
             }
 
-            _chunkUpdateMeshTimer += Time.deltaTime;
+            // TODO: time scale affects this value which is probably an unintended side effects
+            _chunkMainThreadUpdateTimer += Time.deltaTime;
 
             // TODO: remove chunks not required
         }
