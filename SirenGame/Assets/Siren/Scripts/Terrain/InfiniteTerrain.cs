@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 
@@ -23,11 +24,11 @@ namespace Siren.Scripts.Terrain
 
         private Vector2Int _lastPlayerPosition = new(999, 999);
 
+        private Vector2Int[] _currentSortedChunkPositions = { };
+        private readonly Object _currentSortedChunkPositionsLock = new();
+
         private Thread _meshGenThread;
         private bool _externalThreadRunning = true;
-
-        // private const float ChunkMainThreadUpdateTimeout = 0.05f;
-        // private float _chunkMainThreadUpdateTimer = ChunkMainThreadUpdateTimeout;
 
         private void Start()
         {
@@ -54,6 +55,7 @@ namespace Siren.Scripts.Terrain
                 {
                     Destroy(chunk.gameObject);
                 }
+
                 _chunks.Clear();
             }
         }
@@ -61,6 +63,7 @@ namespace Siren.Scripts.Terrain
         private void OnValidate()
         {
             // when parameters change
+            _lastPlayerPosition = new Vector2Int(999, 999);
             DeleteAllChunks();
         }
 
@@ -82,18 +85,15 @@ namespace Siren.Scripts.Terrain
 
         private Vector2Int GetPlayerChunkPosition()
         {
-#if UNITY_EDITOR
-            var playerPos = Camera.main.transform.position;
-#else
             var playerPos = playerCharacterTransform.position;
-#endif
+            var halfAChunk = chunkSize * 0.5f;
             return new Vector2Int(
-                Mathf.FloorToInt(playerPos.x / chunkSize),
-                Mathf.FloorToInt(playerPos.z / chunkSize)
+                Mathf.FloorToInt(playerPos.x + halfAChunk) / chunkSize,
+                Mathf.FloorToInt(playerPos.z + halfAChunk) / chunkSize
             );
         }
 
-        private List<(Vector2Int, float)> GetSpiralChunkPositionsAroundPlayer(Vector2Int playerChunkPosition)
+        private Vector2Int[] GetSpiralChunkPositionsAroundPlayer(Vector2Int playerChunkPosition)
         {
             // TODO: optimize this!
 
@@ -104,8 +104,8 @@ namespace Siren.Scripts.Terrain
                 for (var deltaX = -viewDistance; deltaX < viewDistance; deltaX++)
                 {
                     var chunkPosition = playerChunkPosition + new Vector2Int(deltaX, deltaZ);
-                    var chunkDistance = Vector2Int.Distance(playerChunkPosition, chunkPosition);
-                    if (chunkDistance <= viewDistance)
+                    var chunkDistance = Vector2.Distance(playerChunkPosition, chunkPosition);
+                    if (chunkDistance < viewDistance)
                     {
                         // in view distance radius
                         chunkPositions.Add((chunkPosition, chunkDistance));
@@ -113,24 +113,30 @@ namespace Siren.Scripts.Terrain
                 }
             }
 
-            chunkPositions.Sort((a, b) => (int) (a.Item2 - b.Item2));
-
-            return chunkPositions;
+            chunkPositions.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+            
+            
+            return chunkPositions.Select(tuple => tuple.Item1).ToArray();
         }
 
         private InfiniteTerrainChunk CreateChunkGameObject(Vector2Int chunkPosition)
         {
+            var position = new Vector3(
+                chunkPosition.x * chunkSize - chunkSize / 2,
+                0,
+                chunkPosition.y * chunkSize - chunkSize / 2
+            );
+
             var chunk = new GameObject
             {
                 name = $"Chunk {chunkPosition.x},{chunkPosition.y}",
                 isStatic = true,
                 transform =
                 {
-                    position = new Vector3(chunkPosition.x * chunkSize, 0, chunkPosition.y * chunkSize),
+                    position = position,
                     parent = transform
                 },
-                // TODO: only doing this for performance reasons, remove somehow
-                hideFlags = HideFlags.HideAndDontSave
+                // hideFlags = HideFlags.HideAndDontSave
             };
 
             var infiniteTerrainChunk = chunk.AddComponent<InfiniteTerrainChunk>();
@@ -146,14 +152,17 @@ namespace Siren.Scripts.Terrain
             {
                 // find closest chunk that needs work
 
-                var playerChunkPosition = _lastPlayerPosition;
-                var chunkPositions = GetSpiralChunkPositionsAroundPlayer(playerChunkPosition);
+                Vector2Int[] currentSortedChunkPositions;
+                lock (_currentSortedChunkPositionsLock)
+                {
+                    currentSortedChunkPositions = _currentSortedChunkPositions;
+                }
 
                 InfiniteTerrainChunk chunk = null;
 
-                foreach (var position in chunkPositions)
+                foreach (var position in currentSortedChunkPositions)
                 {
-                    var queryChunk = GetThreadSafeChunk(position.Item1);
+                    var queryChunk = GetThreadSafeChunk(position);
                     if (
                         queryChunk == null ||
                         queryChunk.status is not (ChunkStatus.NeedMeshGen or ChunkStatus.NeedPhysicsBake)
@@ -171,40 +180,42 @@ namespace Siren.Scripts.Terrain
         public void Update()
         {
             // TODO: make sure its really rendering the ones closest to the player first
-            
+
             var playerChunkPosition = GetPlayerChunkPosition();
-            _lastPlayerPosition = playerChunkPosition;
+            if (playerChunkPosition != _lastPlayerPosition)
+            {
+                var currentSortedChunkPositions = GetSpiralChunkPositionsAroundPlayer(playerChunkPosition);
+                lock (_currentSortedChunkPositionsLock)
+                {
+                    _currentSortedChunkPositions = currentSortedChunkPositions;
+                }
+
+                _lastPlayerPosition = playerChunkPosition;
+            }
 
             // search around player with view distance
-            var chunkPositionsRequired = GetSpiralChunkPositionsAroundPlayer(playerChunkPosition);
 
-            // var canUpdateOneChunk = _chunkMainThreadUpdateTimer >= ChunkMainThreadUpdateTimeout;
             var canUpdateOneChunk = true;
 
-            foreach (var chunkPosition in chunkPositionsRequired)
+            foreach (var chunkPosition in _currentSortedChunkPositions)
             {
-                var chunk = GetThreadSafeChunk(chunkPosition.Item1);
+                var chunk = GetThreadSafeChunk(chunkPosition);
                 if (chunk != null)
                 {
                     // if thread generated mesh data but it's not been applied yet (has to be done in main thread)
                     if (canUpdateOneChunk && chunk.status is ChunkStatus.GotMeshGen or ChunkStatus.GotPhysicsBake)
                     {
                         chunk.DoMainThreadWork();
-                        // _chunkMainThreadUpdateTimer -= ChunkMainThreadUpdateTimeout;
                         canUpdateOneChunk = false;
                     }
                 }
                 else
                 {
                     // make a chunk
-                    chunk = CreateChunkGameObject(chunkPosition.Item1);
-                    SetThreadSafeChunk(chunkPosition.Item1, chunk);
+                    chunk = CreateChunkGameObject(chunkPosition);
+                    SetThreadSafeChunk(chunkPosition, chunk);
                 }
             }
-
-            // nevermind.. time scale affects this value which is probably an unintended side effects
-            // _chunkMainThreadUpdateTimer += Time.deltaTime;
-            // Debug.Log(_chunkMainThreadUpdateTimer);
 
             // TODO: remove chunks not required
         }
