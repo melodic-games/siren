@@ -61,7 +61,7 @@ namespace Siren.Scripts.Terrain
                         x * squareSize - terrainOffset.x,
                         z * squareSize - terrainOffset.z
                     );
-
+                    
                     vertices[i] = new Vector3(x * squareSize, noise, z * squareSize) - terrainOffset;
                     uv[i] = new Vector2((float) x / terrainResolution, (float) z / terrainResolution);
 
