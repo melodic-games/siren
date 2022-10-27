@@ -15,7 +15,7 @@ namespace Siren.Scripts.Managers
 
         public PlayerManager PlayerManager;
         [Header("Player")] public SirenPlayer player;
-        
+
         private Manager[] _managers;
         private bool _initialized;
 
@@ -33,7 +33,7 @@ namespace Siren.Scripts.Managers
             var managers = new List<Manager>();
 
             managers.Add(MenuManager = new MenuManager(menuUICanvasPrefab));
-            
+
             managers.Add(PlayerManager = new PlayerManager(player));
 
             _managers = managers.ToArray();

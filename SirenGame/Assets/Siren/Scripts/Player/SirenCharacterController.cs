@@ -41,7 +41,7 @@ namespace Siren.Scripts.Player
         private float _timeSinceJumpRequested = Mathf.Infinity;
         private float _timeSinceLastAbleToJump;
 
-        // player controller will set this
+        // player manager will set this
         [HideInInspector] public bool resetVelocity;
 
         private void Start()
