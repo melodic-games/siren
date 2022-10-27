@@ -19,7 +19,7 @@ namespace Siren.Scripts.Terrain
 
         [Range(100f, 5000f)] public int terrainSize = 500;
         [Range(128, 512)] public int terrainResolution = 128;
-        [Range(0.01f, 0.001f)] public float noiseSize = 0.05f;
+        [Range(0.01f, 0.001f)] public float noiseSize = 0.005f;
         [Range(0.1f, 100f)] public float noiseHeight = 10;
 
         private void Awake()
@@ -68,6 +68,7 @@ namespace Siren.Scripts.Terrain
                         noiseSize,
                         noiseHeight
                     );
+                    
                     _vertices[i] = new Vector3(x * squareSize, y, z * squareSize) - terrainOffset;
                     i++;
                 }
