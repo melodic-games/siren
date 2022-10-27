@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2164.2607, g: 2272.8125, b: 3311.3672, a: 1}
+  m_IndirectSpecularColor: {r: 2160.043, g: 2263.8164, b: 3286.5586, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1123,5 +1123,5 @@ MonoBehaviour:
   terrainMaterial: {fileID: 2100000, guid: 7a6d40337c889634383565be40c22866, type: 2}
   chunkSize: 512
   chunkResolution: 254
-  noiseSize: 0.01
-  noiseHeight: 100
+  noiseSize: 0.00446
+  noiseHeight: 23.8

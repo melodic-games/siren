@@ -27,12 +27,13 @@ namespace Siren.Scripts.Terrain
         // private MeshRenderer _meshRenderer;
         // private MeshCollider _meshCollider;
 
-        private (Vector3[], int[]) _meshData;
+        private (Vector3[], int[], Vector2[]) _meshData;
         private Mesh _mesh;
 
-        private (Vector3[], int[]) _physicsMeshData;
-        private Mesh _physicsMesh;
-        private int _physicsMeshInstanceId;
+        // private (Vector3[], int[]) _physicsMeshData;
+        // private Mesh _physicsMesh;
+        // private int _physicsMeshInstanceId;
+        private int _meshInstanceId;
 
         public ChunkStatus status = ChunkStatus.NeedMeshGen;
 
@@ -54,13 +55,14 @@ namespace Siren.Scripts.Terrain
             ) * infiniteTerrain.noiseHeight;
         }
 
-        private (Vector3[], int[]) GenerateMeshData(int chunkResolution)
+        private (Vector3[], int[], Vector2[]) GenerateMeshData(int chunkResolution)
         {
             Profiler.BeginSample("Chunk GenerateMeshData");
 
             var chunkSize = infiniteTerrain.chunkSize;
 
             var vertices = new Vector3[(chunkResolution + 1) * (chunkResolution + 1)];
+            var uv = new Vector2[(chunkResolution + 1) * (chunkResolution + 1)];
 
             var squareSize = chunkSize / (float) chunkResolution;
 
@@ -71,6 +73,7 @@ namespace Siren.Scripts.Terrain
                 {
                     var y = GetNoise(x * squareSize, z * squareSize);
                     vertices[i] = new Vector3(x * squareSize, y, z * squareSize);
+                    uv[i] = new Vector2((float) x / chunkResolution, (float) z / chunkResolution);
                     i++;
                 }
             }
@@ -100,7 +103,7 @@ namespace Siren.Scripts.Terrain
 
             Profiler.EndSample();
 
-            return (vertices, triangles);
+            return (vertices, triangles, uv);
         }
 
         private void GenerateAllMeshData()
@@ -108,7 +111,10 @@ namespace Siren.Scripts.Terrain
             Profiler.BeginSample("Chunk GenerateAllMeshData");
 
             _meshData = GenerateMeshData(infiniteTerrain.chunkResolution);
-            _physicsMeshData = GenerateMeshData(infiniteTerrain.chunkResolution);
+            
+            // var physicsMeshData = GenerateMeshData(infiniteTerrain.chunkResolution);
+            // _physicsMeshData.Item1 = physicsMeshData.Item1;
+            // _physicsMeshData.Item2 = physicsMeshData.Item2;
 
             Profiler.EndSample();
         }
@@ -122,25 +128,27 @@ namespace Siren.Scripts.Terrain
                 name = gameObject.name,
                 vertices = _meshData.Item1,
                 triangles = _meshData.Item2,
+                uv = _meshData.Item3,
                 indexFormat = IndexFormat.UInt16
             };
             _mesh.RecalculateNormals();
             _mesh.RecalculateBounds();
             // _mesh.Optimize();
 
+            // _physicsMesh = new Mesh
+            // {
+            //     name = "Physics " + gameObject.name,
+            //     vertices = _physicsMeshData.Item1,
+            //     triangles = _physicsMeshData.Item2,
+            //     indexFormat = IndexFormat.UInt16
+            // };
+            // _physicsMesh.RecalculateNormals();
+            // _physicsMesh.RecalculateBounds();
+            // // _physicsMesh.Optimize();
 
-            _physicsMesh = new Mesh
-            {
-                name = "Physics " + gameObject.name,
-                vertices = _physicsMeshData.Item1,
-                triangles = _physicsMeshData.Item2,
-                indexFormat = IndexFormat.UInt16
-            };
-            _physicsMesh.RecalculateNormals();
-            _physicsMesh.RecalculateBounds();
-            // _physicsMesh.Optimize();
-
-            _physicsMeshInstanceId = _physicsMesh.GetInstanceID();
+            // _physicsMeshInstanceId = _physicsMesh.GetInstanceID();
+            
+            _meshInstanceId = _mesh.GetInstanceID();
 
             Profiler.EndSample();
         }
@@ -149,7 +157,7 @@ namespace Siren.Scripts.Terrain
         {
             Profiler.BeginSample("Chunk PhysicsBake");
 
-            Physics.BakeMesh(_physicsMeshInstanceId, false);
+            Physics.BakeMesh(_meshInstanceId, false);
 
             Profiler.EndSample();
         }
@@ -161,7 +169,7 @@ namespace Siren.Scripts.Terrain
             GetComponent<MeshRenderer>().material = infiniteTerrain.terrainMaterial;
 
             GetComponent<MeshFilter>().sharedMesh = _mesh;
-            GetComponent<MeshCollider>().sharedMesh = _physicsMesh;
+            GetComponent<MeshCollider>().sharedMesh = _mesh;
 
             Profiler.EndSample();
         }
