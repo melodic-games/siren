@@ -51,9 +51,9 @@ namespace Siren.Scripts.Player
         private void HandleCameraInput()
         {
             // Create the look input vector for the camera
-            var mouseLook = _inputActions.Player.Look.ReadValue<Vector2>() * 0.1f;
+            var look = _inputActions.Player.Look.ReadValue<Vector2>();
 
-            _lookInputVector = new Vector3(mouseLook.x, mouseLook.y, 0f);
+            _lookInputVector = new Vector3(look.x, look.y, 0f);
 
             // Prevent moving the camera while the cursor isn't locked
             if (Cursor.lockState != CursorLockMode.Locked)
