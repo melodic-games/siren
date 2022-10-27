@@ -23,24 +23,13 @@ namespace Siren.Scripts.Terrain
         public InfiniteTerrain infiniteTerrain;
         public Vector2Int chunkPosition;
 
-        // private MeshFilter _meshFilter;
-        // private MeshRenderer _meshRenderer;
-        // private MeshCollider _meshCollider;
-
         private (Vector3[], int[], Vector2[]) _meshData;
         private Mesh _mesh;
 
-        // private (Vector3[], int[]) _physicsMeshData;
-        // private Mesh _physicsMesh;
-        // private int _physicsMeshInstanceId;
         private int _meshInstanceId;
 
+        public bool doingExternalThreadWork;
         public ChunkStatus status = ChunkStatus.NeedMeshGen;
-
-        private void Awake()
-        {
-            
-        }
 
         private float GetNoise(float x, float z)
         {
@@ -111,10 +100,6 @@ namespace Siren.Scripts.Terrain
             Profiler.BeginSample("Chunk GenerateAllMeshData");
 
             _meshData = GenerateMeshData(infiniteTerrain.chunkResolution);
-            
-            // var physicsMeshData = GenerateMeshData(infiniteTerrain.chunkResolution);
-            // _physicsMeshData.Item1 = physicsMeshData.Item1;
-            // _physicsMeshData.Item2 = physicsMeshData.Item2;
 
             Profiler.EndSample();
         }
@@ -135,19 +120,6 @@ namespace Siren.Scripts.Terrain
             _mesh.RecalculateBounds();
             // _mesh.Optimize();
 
-            // _physicsMesh = new Mesh
-            // {
-            //     name = "Physics " + gameObject.name,
-            //     vertices = _physicsMeshData.Item1,
-            //     triangles = _physicsMeshData.Item2,
-            //     indexFormat = IndexFormat.UInt16
-            // };
-            // _physicsMesh.RecalculateNormals();
-            // _physicsMesh.RecalculateBounds();
-            // // _physicsMesh.Optimize();
-
-            // _physicsMeshInstanceId = _physicsMesh.GetInstanceID();
-            
             _meshInstanceId = _mesh.GetInstanceID();
 
             Profiler.EndSample();
@@ -165,7 +137,7 @@ namespace Siren.Scripts.Terrain
         private void PushMeshes()
         {
             Profiler.BeginSample("Chunk PushMeshes");
-            
+
             GetComponent<MeshRenderer>().material = infiniteTerrain.terrainMaterial;
 
             GetComponent<MeshFilter>().sharedMesh = _mesh;
@@ -176,6 +148,9 @@ namespace Siren.Scripts.Terrain
 
         public void DoExternalThreadWork()
         {
+            if (doingExternalThreadWork) return;
+            doingExternalThreadWork = true;
+
             switch (status)
             {
                 case ChunkStatus.NeedMeshGen:
@@ -187,6 +162,8 @@ namespace Siren.Scripts.Terrain
                     status = ChunkStatus.GotPhysicsBake;
                     break;
             }
+
+            doingExternalThreadWork = false;
         }
 
         public void DoMainThreadWork()

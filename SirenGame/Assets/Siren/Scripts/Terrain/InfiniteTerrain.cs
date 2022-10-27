@@ -27,21 +27,33 @@ namespace Siren.Scripts.Terrain
         private Vector2Int[] _currentSortedChunkPositions = { };
         private readonly Object _currentSortedChunkPositionsLock = new();
 
-        private Thread _meshGenThread;
+        private Thread[] _meshGenThreads;
         private bool _externalThreadRunning = true;
 
         private void Start()
         {
-            _meshGenThread = new Thread(ExternalThread);
-            _meshGenThread.Start();
+            _meshGenThreads = new[]
+            {
+                new Thread(ExternalThread),
+                new Thread(ExternalThread)
+            };
+
+            foreach (var thread in _meshGenThreads)
+            {
+                thread.Start();
+            }
         }
 
         private void OnDestroy()
         {
             _externalThreadRunning = false;
-            if (_meshGenThread.IsAlive)
+
+            foreach (var thread in _meshGenThreads)
             {
-                _meshGenThread.Join();
+                if (thread.IsAlive)
+                {
+                    thread.Join();
+                }
             }
 
             DeleteAllChunks();
@@ -114,8 +126,7 @@ namespace Siren.Scripts.Terrain
             }
 
             chunkPositions.Sort((a, b) => a.Item2.CompareTo(b.Item2));
-            
-            
+
             return chunkPositions.Select(tuple => tuple.Item1).ToArray();
         }
 
@@ -165,6 +176,7 @@ namespace Siren.Scripts.Terrain
                     var queryChunk = GetThreadSafeChunk(position);
                     if (
                         queryChunk == null ||
+                        queryChunk.doingExternalThreadWork ||
                         queryChunk.status is not (ChunkStatus.NeedMeshGen or ChunkStatus.NeedPhysicsBake)
                     ) continue;
                     chunk = queryChunk;

@@ -286,7 +286,7 @@ Material:
     - _RimPower: 10
     - _RimStrength: 1
     - _RippleStrength: 1
-    - _RipplesSize: 50
+    - _RipplesSize: 150
     - _RipplesSteepnessPower: 1
     - _SandSize: 32
     - _SandStrength: 0.3
