@@ -41,6 +41,9 @@ namespace Siren.Scripts.Player
         private float _timeSinceJumpRequested = Mathf.Infinity;
         private float _timeSinceLastAbleToJump;
 
+        // player controller will set this
+        [HideInInspector] public bool resetVelocity;
+
         private void Start()
         {
             motor.CharacterController = this;
@@ -106,6 +109,12 @@ namespace Siren.Scripts.Player
         public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
         {
             // This is called when the motor wants to know what its velocity should be right now
+
+            if (resetVelocity)
+            {
+                currentVelocity = Vector3.zero;
+                resetVelocity = false;
+            }
 
             Vector3 targetMovementVelocity;
 

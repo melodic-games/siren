@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Siren.Scripts.Player;
 using UnityEngine;
 
 namespace Siren.Scripts.Managers
@@ -12,6 +13,9 @@ namespace Siren.Scripts.Managers
         public MenuManager MenuManager;
         [Header("Menu")] public GameObject menuUICanvasPrefab;
 
+        public PlayerManager PlayerManager;
+        [Header("Player")] public SirenPlayer player;
+        
         private Manager[] _managers;
         private bool _initialized;
 
@@ -29,6 +33,8 @@ namespace Siren.Scripts.Managers
             var managers = new List<Manager>();
 
             managers.Add(MenuManager = new MenuManager(menuUICanvasPrefab));
+            
+            managers.Add(PlayerManager = new PlayerManager(player));
 
             _managers = managers.ToArray();
 

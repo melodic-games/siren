@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2183.087, g: 2318.3691, b: 3449.6172, a: 1}
+  m_IndirectSpecularColor: {r: 2164.2607, g: 2272.8125, b: 3311.3672, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -574,6 +574,7 @@ MonoBehaviour:
   jumpPostGroundingGraceTime: 0
   gravity: {x: 0, y: -30, z: 0}
   meshRoot: {fileID: 0}
+  resetVelocity: 0
 --- !u!1 &884060008
 GameObject:
   m_ObjectHideFlags: 0
@@ -667,6 +668,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuUICanvasPrefab: {fileID: 404667506159704647, guid: 6f51ae80b1eee3d46b460980b374534d,
     type: 3}
+  player: {fileID: 884060010}
 --- !u!1 &1742982715
 GameObject:
   m_ObjectHideFlags: 0
@@ -802,7 +804,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 10000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -1119,7 +1121,7 @@ MonoBehaviour:
   viewDistance: 12
   playerCharacterTransform: {fileID: 548559969}
   terrainMaterial: {fileID: 2100000, guid: 7a6d40337c889634383565be40c22866, type: 2}
-  chunkSize: 128
+  chunkSize: 512
   chunkResolution: 254
-  noiseSize: 0.005
-  noiseHeight: 30
+  noiseSize: 0.01
+  noiseHeight: 100
