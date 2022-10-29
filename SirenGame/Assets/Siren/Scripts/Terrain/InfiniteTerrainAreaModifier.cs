@@ -5,6 +5,7 @@ using UnityEngine.Serialization;
 
 namespace Siren.Scripts.Terrain
 {
+    [ExecuteInEditMode]
     public class InfiniteTerrainAreaModifier : MonoBehaviour
     {
         public InfiniteTerrain infiniteTerrain;
@@ -21,7 +22,7 @@ namespace Siren.Scripts.Terrain
 
         private Bounds _bounds;
 
-        public void Awake()
+        public void OnEnable()
         {
             _position = transform.position;
             UpdateBounds();

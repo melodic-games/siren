@@ -2,13 +2,17 @@
 using System.Linq;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.Serialization;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Siren.Scripts.Terrain
 {
-    // [ExecuteInEditMode]
+    [ExecuteInEditMode]
     public class InfiniteTerrain : MonoBehaviour
     {
+        // TODO: setting view distance too high makes lag
+        
         [Header("General"), Range(1, 32f)] public int viewDistance = 4;
         public Transform playerCharacterTransform;
         public Material terrainMaterial;
@@ -23,18 +27,20 @@ namespace Siren.Scripts.Terrain
         [Header("Area Modifiers")] public InfiniteTerrainAreaModifier[] areaModifiers;
 
         private readonly Dictionary<Vector2Int, InfiniteTerrainChunk> _chunks = new();
-        private readonly Object _chunksLock = new();
+        private readonly object _chunksLock = new();
 
-        private Vector2Int _lastPlayerPosition = new(999, 999);
+        private Vector2Int _lastPlayerPosition = new(999999, 999999);
 
         private Vector2Int[] _currentSortedChunkPositions = { };
-        private readonly Object _currentSortedChunkPositionsLock = new();
+        private readonly object _currentSortedChunkPositionsLock = new();
 
         private Thread[] _meshGenThreads;
         private bool _externalThreadRunning = true;
 
-        private void Start()
+        private void OnEnable()
         {
+            _externalThreadRunning = true;
+
             _meshGenThreads = new[]
             {
                 new Thread(ExternalThread),
@@ -45,10 +51,24 @@ namespace Siren.Scripts.Terrain
             {
                 thread.Start();
             }
+
+#if UNITY_EDITOR
+            if (!EditorApplication.isPlaying)
+            {
+                EditorApplication.update += UpdateFn;
+            }
+#endif
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
+#if UNITY_EDITOR
+            if (!EditorApplication.isPlaying)
+            {
+                EditorApplication.update -= UpdateFn;
+            }
+#endif
+
             _externalThreadRunning = false;
 
             foreach (var thread in _meshGenThreads)
@@ -62,13 +82,29 @@ namespace Siren.Scripts.Terrain
             DeleteAllChunks();
         }
 
+        private void DestroyChunk(InfiniteTerrainChunk chunk)
+        {
+#if UNITY_EDITOR
+            if (EditorApplication.isPlaying)
+            {
+                Destroy(chunk.gameObject);
+            }
+            else
+            {
+                DestroyImmediate(chunk.gameObject);
+            }
+#else
+            Destroy(chunk.gameObject)
+#endif
+        }
+
         public void DeleteAllChunks()
         {
             lock (_chunksLock)
             {
                 foreach (var chunk in _chunks.Values)
                 {
-                    Destroy(chunk.gameObject);
+                    DestroyChunk(chunk);
                 }
 
                 _chunks.Clear();
@@ -172,7 +208,7 @@ namespace Siren.Scripts.Terrain
                     position = position,
                     parent = transform
                 },
-                // hideFlags = HideFlags.HideAndDontSave
+                hideFlags = HideFlags.HideAndDontSave
             };
 
             var infiniteTerrainChunk = chunk.AddComponent<InfiniteTerrainChunk>();
@@ -215,7 +251,7 @@ namespace Siren.Scripts.Terrain
             }
         }
 
-        public void Update()
+        public void UpdateFn()
         {
             var playerChunkPosition = GetPlayerChunkPosition();
             if (playerChunkPosition != _lastPlayerPosition)
@@ -255,16 +291,29 @@ namespace Siren.Scripts.Terrain
 
             // remove chunks not required
 
+            InfiniteTerrainChunk[] chunks;
             lock (_chunksLock)
             {
-                var chunks = _chunks.Values.ToArray();
-                foreach (var chunk in chunks)
+                chunks = _chunks.Values.ToArray();
+            }
+
+            foreach (var chunk in chunks)
+            {
+                if (_currentSortedChunkPositions.Contains(chunk.chunkPosition)) continue;
+                DestroyChunk(chunk);
+                lock (_chunksLock)
                 {
-                    if (_currentSortedChunkPositions.Contains(chunk.chunkPosition)) continue;
-                    Destroy(chunk.gameObject);
                     _chunks.Remove(chunk.chunkPosition);
                 }
             }
+        }
+
+        public void Update()
+        {
+#if UNITY_EDITOR
+            if (!EditorApplication.isPlaying) return;
+#endif
+            UpdateFn();
         }
     }
 }

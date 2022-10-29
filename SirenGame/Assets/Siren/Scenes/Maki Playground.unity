@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2186.5889, g: 2337.164, b: 3523.8984, a: 1}
+  m_IndirectSpecularColor: {r: 2183.8975, g: 2321.2305, b: 3460.121, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -683,7 +683,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1136912898}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 730, y: 5.7, z: -539}
+  m_LocalPosition: {x: 501, y: 5.7, z: -369}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -705,8 +705,8 @@ MonoBehaviour:
   infiniteTerrain: {fileID: 2104520411}
   radius: 600
   falloff: 350
-  noiseSize: 0.00289
-  noiseHeight: 200
+  noiseSize: 0.00371
+  noiseHeight: 136
 --- !u!1 &1437528079
 GameObject:
   m_ObjectHideFlags: 0
@@ -1203,12 +1203,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e6537ebe999491d8e7381d5c7a2d405, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewDistance: 8
+  viewDistance: 4
   playerCharacterTransform: {fileID: 548559969}
   terrainMaterial: {fileID: 2100000, guid: 7a6d40337c889634383565be40c22866, type: 2}
   chunkSize: 512
   chunkResolution: 100
-  noiseSize: 0.008
-  noiseHeight: 10
+  noiseSize: 0.00513
+  noiseHeight: 15.6
   areaModifiers:
   - {fileID: 1136912900}
