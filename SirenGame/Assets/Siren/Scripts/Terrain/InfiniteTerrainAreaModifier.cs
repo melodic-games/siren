@@ -103,6 +103,12 @@ namespace Siren.Scripts.Terrain
                 );
             }
 
+            Gizmos.DrawIcon(
+                transform.position + new Vector3(0, noiseHeight, 0),
+                "terrain-area-modifier.png",
+                false
+            );
+
             // GizmoUtils.DrawBounds(_bounds);
         }
     }
