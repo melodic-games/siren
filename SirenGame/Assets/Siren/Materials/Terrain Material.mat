@@ -346,7 +346,7 @@ Material:
     - _IridescenceThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _OceanColor: {r: 0, g: 0, b: 0, a: 0}
     - _OceanSpecularColor: {r: 1, g: 0.74171203, b: 0.5801887, a: 0}
-    - _RimColor: {r: 1, g: 0.4393837, b: 0.109803915, a: 0}
+    - _RimColor: {r: 1, g: 0.43620914, b: 0.109803915, a: 0}
     - _SandColor: {r: 1, g: 1, b: 1, a: 0}
     - _ShadowColor: {r: 1, g: 0, b: 0, a: 0}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}

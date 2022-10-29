@@ -79,7 +79,7 @@ namespace Siren.Scripts.Terrain
 
             var bounds = new Bounds(
                 chunkWorldPosition,
-                new Vector3(chunkSize, 999, chunkSize)
+                new Vector3(chunkSize, 99999, chunkSize)
             );
 
             var areaModifiers = infiniteTerrain.GetAreaModifiersInBounds(bounds);
@@ -121,6 +121,8 @@ namespace Siren.Scripts.Terrain
                                     modifier.noiseSize,
                                     modifier.noiseHeight
                                 );
+
+                                modifierY += modifier.GetPosition().y;
 
                                 if (distance < modifier.radius)
                                 {

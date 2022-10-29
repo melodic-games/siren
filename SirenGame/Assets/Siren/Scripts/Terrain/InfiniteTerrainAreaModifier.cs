@@ -1,7 +1,6 @@
-﻿using System;
-using Siren.Scripts.Utils;
+﻿using Siren.Scripts.Utils;
 using UnityEngine;
-using UnityEngine.Serialization;
+
 
 namespace Siren.Scripts.Terrain
 {
@@ -46,12 +45,17 @@ namespace Siren.Scripts.Terrain
         private void UpdateBounds()
         {
             var size = (radius + falloff) * 2;
-            _bounds = new Bounds(transform.position, new Vector3(size, 999, size));
+            _bounds = new Bounds(transform.position, new Vector3(size, 99999, size));
         }
 
         public Bounds GetBounds()
         {
             return _bounds;
+        }
+
+        public Vector3 GetPosition()
+        {
+            return _position;
         }
 
         public float XZDistanceFrom(Vector3 position)
