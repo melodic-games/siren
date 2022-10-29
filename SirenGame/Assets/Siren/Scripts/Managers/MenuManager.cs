@@ -19,10 +19,12 @@ namespace Siren.Scripts.Managers
         private CanvasGroup _pauseScreenCanvasGroup;
         private RectTransform _pauseIcon;
 
-        private const float PauseIconYDistance = 15f;
+        // private const float PauseIconYDistance = 15f;
+        private const float PauseIconIntScale = .6f;
 
         private TweenManager.Tweener _pauseScreenOpacity;
-        private TweenManager.Tweener _pauseIconY;
+        //private TweenManager.Tweener _pauseIconY;
+        private TweenManager.Tweener _pauseIconScale;
 
         private TweenManager.Tweener _timeScale;
 
@@ -52,9 +54,14 @@ namespace Siren.Scripts.Managers
                 0f
             );
 
-            _pauseIconY = _tweenManager.NewTweener(
-                y => { _pauseIcon.anchoredPosition = new Vector2(_pauseIcon.anchoredPosition.x, y); },
-                -PauseIconYDistance
+            // _pauseIconY = _tweenManager.NewTweener(
+            //     y => { _pauseIcon.anchoredPosition = new Vector2(_pauseIcon.anchoredPosition.x, y); },
+            //     -PauseIconYDistance
+            // );
+
+            _pauseIconScale = _tweenManager.NewTweener(
+                scale => { _pauseIcon.localScale = new Vector3(scale, scale, scale); },
+                PauseIconIntScale
             );
 
             _timeScale = _tweenManager.NewTweener(
@@ -84,7 +91,8 @@ namespace Siren.Scripts.Managers
 
             // _menuUICanvas.gameObject.SetActive(true);
             _pauseScreenOpacity.Tween(1f, 200f, EasingFunctions.Easing.OutQuad);
-            _pauseIconY.Tween(0, 300f, EasingFunctions.Easing.OutQuad);
+            // _pauseIconY.Tween(0, 300f, EasingFunctions.Easing.OutQuad);
+            _pauseIconScale.Tween(1f, 250f, EasingFunctions.Easing.OutQuad);
 
             _paused = true;
         }
@@ -99,7 +107,8 @@ namespace Siren.Scripts.Managers
 
             // _menuUICanvas.gameObject.SetActive(false);
             _pauseScreenOpacity.Tween(0f, 100f, EasingFunctions.Easing.OutQuad);
-            _pauseIconY.Tween(-PauseIconYDistance, 200f, EasingFunctions.Easing.OutQuad);
+            //_pauseIconY.Tween(-PauseIconYDistance, 200f, EasingFunctions.Easing.OutQuad);
+            _pauseIconScale.Tween(PauseIconIntScale, 200f, EasingFunctions.Easing.OutQuad);
 
             _paused = false;
         }
