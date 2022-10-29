@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Siren.Scripts.UI;
 using Siren.Scripts.Utils;
 using UnityEngine;
@@ -32,6 +34,8 @@ namespace Siren.Scripts.Terrain
 
         public bool doingExternalThreadWork;
         public ChunkStatus status = ChunkStatus.NeedMeshGen;
+        
+        private CancellationTokenSource _cts = new();
 
         // private Bounds _bounds;
         //
@@ -224,24 +228,34 @@ namespace Siren.Scripts.Terrain
             Profiler.EndSample();
         }
 
-        public void DoExternalThreadWork()
+        public void ReloadThreadSafe()
         {
-            if (doingExternalThreadWork) return;
+            _cts.Cancel();
+            doingExternalThreadWork = false;
+            status = ChunkStatus.NeedMeshGen;
+        }
+
+        public Task DoExternalThreadWork()
+        {
+            if (doingExternalThreadWork) return Task.CompletedTask;
             doingExternalThreadWork = true;
 
-            switch (status)
+            return Task.Run(() =>
             {
-                case ChunkStatus.NeedMeshGen:
-                    GenerateAllMeshData();
-                    status = ChunkStatus.GotMeshGen;
-                    break;
-                case ChunkStatus.NeedPhysicsBake:
-                    PhysicsBake();
-                    status = ChunkStatus.GotPhysicsBake;
-                    break;
-            }
+                switch (status)
+                {
+                    case ChunkStatus.NeedMeshGen:
+                        GenerateAllMeshData();
+                        status = ChunkStatus.GotMeshGen;
+                        break;
+                    case ChunkStatus.NeedPhysicsBake:
+                        PhysicsBake();
+                        status = ChunkStatus.GotPhysicsBake;
+                        break;
+                }
 
-            doingExternalThreadWork = false;
+                doingExternalThreadWork = false;
+            });
         }
 
         public void DoMainThreadWork()

@@ -32,14 +32,14 @@ namespace Siren.Scripts.Terrain
             if (Vector3.Distance(_position, transform.position) < 0.01f) return;
 
             _position = transform.position;
-            infiniteTerrain.DeleteAllChunks();
+            infiniteTerrain.ReloadAllChunks();
 
             UpdateBounds();
         }
 
         private void OnValidate()
         {
-            infiniteTerrain.DeleteAllChunks();
+            infiniteTerrain.ReloadAllChunks();
         }
 
         private void UpdateBounds()

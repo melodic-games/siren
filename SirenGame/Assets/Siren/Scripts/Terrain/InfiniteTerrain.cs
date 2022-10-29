@@ -75,23 +75,27 @@ namespace Siren.Scripts.Terrain
             }
         }
 
+        public void ReloadAllChunks()
+        {
+            lock (_chunksLock)
+            {
+                foreach (var chunk in _chunks.Values)
+                {
+                    chunk.ReloadThreadSafe();
+                }
+            }
+        }
+
         private void OnValidate()
         {
             // when parameters change
             _lastPlayerPosition = new Vector2Int(999, 999);
 
-            DeleteAllChunks();
-
-            // TODO: actually make this work so we can mark chunks dirty
-            // currently, external thread might be busy generating whilst this gets set
-
-            // lock (_chunksLock)
-            // {
-            //     foreach (var chunk in _chunks.Values)
-            //     {
-            //         chunk.status = ChunkStatus.NeedMeshGen;
-            //     }
-            // }
+            // TODO: chunk size changes doesnt work with reload all chunks 
+            
+            // DeleteAllChunks();
+            ReloadAllChunks();
+            
         }
 
         public InfiniteTerrainAreaModifier[] GetAreaModifiersInBounds(Bounds bounds)
@@ -129,7 +133,7 @@ namespace Siren.Scripts.Terrain
 
         private Vector2Int[] GetSpiralChunkPositionsAroundPlayer(Vector2Int playerChunkPosition)
         {
-            // TODO: optimize this!
+            // could be optimized but works pretty well for now
 
             var chunkPositions = new List<(Vector2Int, float)>();
 
@@ -179,7 +183,8 @@ namespace Siren.Scripts.Terrain
             return infiniteTerrainChunk;
         }
 
-        private void ExternalThread()
+
+        private async void ExternalThread()
         {
             while (_externalThreadRunning)
             {
@@ -207,14 +212,12 @@ namespace Siren.Scripts.Terrain
 
                 if (chunk == null) continue;
 
-                chunk.DoExternalThreadWork();
+                await chunk.DoExternalThreadWork();
             }
         }
 
         public void Update()
         {
-            // TODO: make sure its really rendering the ones closest to the player first
-
             var playerChunkPosition = GetPlayerChunkPosition();
             if (playerChunkPosition != _lastPlayerPosition)
             {
