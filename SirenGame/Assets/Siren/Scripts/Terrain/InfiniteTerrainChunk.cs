@@ -77,9 +77,10 @@ namespace Siren.Scripts.Terrain
                 (float) chunkPosition.y * infiniteTerrain.chunkSize
             );
 
+            // center y pos is at 0 so y size doesnt matter much 
             var bounds = new Bounds(
                 chunkWorldPosition,
-                new Vector3(chunkSize, 99999, chunkSize)
+                new Vector3(chunkSize, 1, chunkSize)
             );
 
             var areaModifiers = infiniteTerrain.GetAreaModifiersInBounds(bounds);

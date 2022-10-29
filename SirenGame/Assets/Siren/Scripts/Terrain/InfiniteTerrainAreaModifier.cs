@@ -54,7 +54,11 @@ namespace Siren.Scripts.Terrain
         private void UpdateBounds()
         {
             var size = (radius + falloff) * 2;
-            _bounds = new Bounds(transform.position, new Vector3(size, 99999, size));
+            // center y pos is at 0 so y size doesnt matter much
+            _bounds = new Bounds(
+                new Vector3(transform.position.x, 0, transform.position.z),
+                new Vector3(size, 1, size)
+            );
         }
 
         public Bounds GetBounds()
