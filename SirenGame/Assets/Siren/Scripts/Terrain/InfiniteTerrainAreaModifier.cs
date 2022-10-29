@@ -52,7 +52,7 @@ namespace Siren.Scripts.Terrain
         {
             return _bounds;
         }
-        
+
         public float DistanceFrom(Vector3 position)
         {
             return Vector3.Distance(_position, position);
@@ -60,17 +60,16 @@ namespace Siren.Scripts.Terrain
 
         public void OnDrawGizmos()
         {
-            Gizmos.color = Color.red;
-            GizmoUtils.DrawFlatCircleGizmo(transform.position, radius);
+            const int steps = 8;
 
-            Gizmos.color = Color.yellow;
-            GizmoUtils.DrawFlatCircleGizmo(transform.position, radius + falloff / 3);
-
-            Gizmos.color = Color.green;
-            GizmoUtils.DrawFlatCircleGizmo(transform.position, radius + falloff / 3 * 2);
-
-            Gizmos.color = Color.blue;
-            GizmoUtils.DrawFlatCircleGizmo(transform.position, radius + falloff);
+            for (var i = 0; i < steps + 1; i++)
+            {
+                var t = (float) i / (steps);
+                var color = Color.HSVToRGB(t, 1, 1);
+                // color.a = 1f - t;
+                Gizmos.color = color;
+                GizmoUtils.DrawFlatCircleGizmo(transform.position, radius + t * falloff);
+            }
 
             // GizmoUtils.DrawBounds(_bounds);
         }
