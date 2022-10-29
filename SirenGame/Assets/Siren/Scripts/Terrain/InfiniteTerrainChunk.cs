@@ -27,14 +27,14 @@ namespace Siren.Scripts.Terrain
         public InfiniteTerrain infiniteTerrain;
         public Vector2Int chunkPosition;
 
-        private (Vector3[], int[], Vector2[]) _meshData;
+        private (Vector3[], int[], Vector2[], Vector3[]) _meshData;
         private Mesh _mesh;
 
         private int _meshInstanceId;
 
         public bool doingExternalThreadWork;
         public ChunkStatus status = ChunkStatus.NeedMeshGen;
-        
+
         private CancellationTokenSource _cts = new();
 
         // private Bounds _bounds;
@@ -57,15 +57,17 @@ namespace Siren.Scripts.Terrain
             ) * noiseHeight;
         }
 
-        private (Vector3[], int[], Vector2[]) GenerateMeshData(int chunkResolution)
+        private (Vector3[], int[], Vector2[], Vector3[]) GenerateMeshData(int chunkResolution)
         {
             Profiler.BeginSample("Chunk GenerateMeshData");
 
             var chunkSize = infiniteTerrain.chunkSize;
             var halfAChunk = chunkSize / 2;
 
-            var vertices = new Vector3[(chunkResolution + 1) * (chunkResolution + 1)];
-            var uv = new Vector2[(chunkResolution + 1) * (chunkResolution + 1)];
+            var verticesLength = (chunkResolution + 1) * (chunkResolution + 1);
+            var vertices = new Vector3[verticesLength];
+            var uv = new Vector2[verticesLength];
+            var normals = new Vector3[verticesLength];
 
             var squareSize = chunkSize / (float) chunkResolution;
 
@@ -93,57 +95,78 @@ namespace Siren.Scripts.Terrain
                         z * squareSize - halfAChunk
                     );
 
-                    var y = GetNoise(
-                        x * squareSize,
-                        z * squareSize,
-                        infiniteTerrain.noiseSize,
-                        infiniteTerrain.noiseHeight
-                    );
-
-
-                    if (areaModifiers.Length > 0)
+                    Vector3 GetPos(int queryX, int queryZ)
                     {
-                        var modifier = areaModifiers[0];
+                        var y = GetNoise(
+                            queryX * squareSize,
+                            queryZ * squareSize,
+                            infiniteTerrain.noiseSize,
+                            infiniteTerrain.noiseHeight
+                        );
 
-                        var distance = modifier.DistanceFrom(worldPosition);
-                        var totalRadius = modifier.radius + modifier.falloff;
-
-                        if (distance < totalRadius)
+                        if (areaModifiers.Length > 0)
                         {
-                            // we're in radius + falloff
+                            var modifier = areaModifiers[0];
 
-                            var modifierY = GetNoise(
-                                x * squareSize,
-                                z * squareSize,
-                                modifier.noiseSize,
-                                modifier.noiseHeight
-                            );
+                            var distance = modifier.DistanceFrom(worldPosition);
+                            var totalRadius = modifier.radius + modifier.falloff;
 
-                            if (distance < modifier.radius)
+                            if (distance < totalRadius)
                             {
-                                // in radius
-                                y = modifierY;
-                            }
-                            else
-                            {
-                                // in falloff
-                                var t = Mathf.InverseLerp(modifier.radius, totalRadius, distance);
-                                y = Mathf.Lerp(
-                                    modifierY,
-                                    y,
-                                    EasingFunctions.Ease(t, EasingFunctions.Easing.InOutSine)
+                                // we're in radius + falloff
+
+                                var modifierY = GetNoise(
+                                    queryX * squareSize,
+                                    queryZ * squareSize,
+                                    modifier.noiseSize,
+                                    modifier.noiseHeight
                                 );
+
+                                if (distance < modifier.radius)
+                                {
+                                    // in radius
+                                    y = modifierY;
+                                }
+                                else
+                                {
+                                    // in falloff
+                                    var t = Mathf.InverseLerp(modifier.radius, totalRadius, distance);
+                                    y = Mathf.Lerp(
+                                        modifierY,
+                                        y,
+                                        EasingFunctions.Ease(t, EasingFunctions.Easing.InOutSine)
+                                    );
+                                }
                             }
                         }
+
+                        return new Vector3(
+                            queryX * squareSize - halfAChunk,
+                            y,
+                            queryZ * squareSize - halfAChunk
+                        );
                     }
 
-                    vertices[i] = new Vector3(
-                        x * squareSize - halfAChunk,
-                        y,
-                        z * squareSize - halfAChunk
-                    );
+                    var position = GetPos(x, z);
+                    vertices[i] = position;
 
                     uv[i] = new Vector2((float) x / chunkResolution, (float) z / chunkResolution);
+
+                    var n = GetPos(x, z + 1) - position;
+                    var e = GetPos(x + 1, z) - position;
+                    var w = GetPos(x - 1, z) - position;
+                    var s = GetPos(x, z - 1) - position;
+
+                    var normal = (
+                        Vector3.Cross(n, e) +
+                        Vector3.Cross(e, s) +
+                        Vector3.Cross(s, w) +
+                        Vector3.Cross(w, n)
+                    );
+                    
+                    normal.Normalize();
+
+                    normals[i] = normal;
 
                     i++;
                 }
@@ -174,7 +197,7 @@ namespace Siren.Scripts.Terrain
 
             Profiler.EndSample();
 
-            return (vertices, triangles, uv);
+            return (vertices, triangles, uv, normals);
         }
 
         private void GenerateAllMeshData()
@@ -196,9 +219,10 @@ namespace Siren.Scripts.Terrain
                 vertices = _meshData.Item1,
                 triangles = _meshData.Item2,
                 uv = _meshData.Item3,
+                normals = _meshData.Item4,
                 indexFormat = IndexFormat.UInt16
             };
-            _mesh.RecalculateNormals();
+            // _mesh.RecalculateNormals();
             _mesh.RecalculateBounds();
             // _mesh.Optimize();
 
