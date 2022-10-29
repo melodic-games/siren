@@ -17,7 +17,7 @@ namespace Siren.Scripts.Terrain
         public Transform playerCharacterTransform;
         public Material terrainMaterial;
 
-        [Header("Generation"), Range(64f, 512f)]
+        [Header("Generation"), Range(64f, 1024f)]
         public int chunkSize = 500;
 
         [Range(100, 254)] public int chunkResolution = 254;
@@ -208,7 +208,8 @@ namespace Siren.Scripts.Terrain
                     position = position,
                     parent = transform
                 },
-                hideFlags = HideFlags.HideAndDontSave
+                hideFlags = HideFlags.DontSave
+                // hideFlags = HideFlags.HideAndDontSave
             };
 
             var infiniteTerrainChunk = chunk.AddComponent<InfiniteTerrainChunk>();
