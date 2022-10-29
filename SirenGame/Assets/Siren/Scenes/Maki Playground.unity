@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2734.2402, g: 2732.8281, b: 3820.5547, a: 1}
+  m_IndirectSpecularColor: {r: 2699.5078, g: 2769.414, b: 4127.2812, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -156,6 +156,7 @@ MonoBehaviour:
   radius: 200
   falloff: 2500
   easing: 35
+  blendMode: 0
   noiseSize: 0.01
   noiseHeight: 7
 --- !u!4 &44954053
@@ -1044,9 +1045,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   infiniteTerrain: {fileID: 2104520411}
-  radius: 250
+  radius: 900
   falloff: 3000
   easing: 17
+  blendMode: 0
   noiseSize: 0.01
   noiseHeight: 7
 --- !u!1 &1437528079

@@ -12,7 +12,14 @@ namespace Siren.Scripts.Terrain
         [Header("Modifier")] public float radius = 4;
         public float falloff = 2;
         public EasingFunctions.Easing easing = EasingFunctions.Easing.InOutSine;
-        public BlendMode blendMode;
+
+        public enum BlendMode
+        {
+            Add,
+            Replace
+        }
+
+        public BlendMode blendMode = BlendMode.Replace;
         
         [Header("Noise"), Range(0.01f, 0.001f)]
         public float noiseSize = 0.005f;

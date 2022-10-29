@@ -84,7 +84,7 @@ namespace Siren.Scripts.Terrain
 
             var areaModifiers = infiniteTerrain.GetAreaModifiersInBounds(bounds);
 
-            var i = 0;
+            var vertexIndex = 0;
             for (var z = 0; z <= chunkResolution; z++)
             {
                 for (var x = 0; x <= chunkResolution; x++)
@@ -106,38 +106,40 @@ namespace Siren.Scripts.Terrain
 
                         if (areaModifiers.Length > 0)
                         {
-                            var modifier = areaModifiers[0];
-
-                            var distance = modifier.XZDistanceFrom(worldPosition);
-                            var totalRadius = modifier.radius + modifier.falloff;
-
-                            if (distance < totalRadius)
+                            foreach (var modifier in areaModifiers)
                             {
-                                // we're in radius + falloff
-
-                                var modifierY = GetNoise(
-                                    queryX * squareSize,
-                                    queryZ * squareSize,
-                                    modifier.noiseSize,
-                                    modifier.noiseHeight
-                                );
-
-                                modifierY += modifier.GetPosition().y;
-
-                                if (distance < modifier.radius)
+                                var distance = modifier.XZDistanceFrom(worldPosition);
+                                var totalRadius = modifier.radius + modifier.falloff;
+                                //modifier.blendMode
+                        
+                                if (distance < totalRadius)
                                 {
-                                    // in radius
-                                    y = modifierY;
-                                }
-                                else
-                                {
-                                    // in falloff
-                                    var t = Mathf.InverseLerp(modifier.radius, totalRadius, distance);
-                                    y = Mathf.Lerp(
-                                        modifierY,
-                                        y,
-                                        EasingFunctions.Ease(t, modifier.easing)
+                                    // we're in radius + falloff
+                        
+                                    var modifierY = GetNoise(
+                                        queryX * squareSize,
+                                        queryZ * squareSize,
+                                        modifier.noiseSize,
+                                        modifier.noiseHeight
                                     );
+                        
+                                    modifierY += modifier.GetPosition().y;
+                        
+                                    if (distance < modifier.radius)
+                                    {
+                                        // in radius
+                                        y = modifierY;
+                                    }
+                                    else
+                                    {
+                                        // in falloff
+                                        var t = Mathf.InverseLerp(modifier.radius, totalRadius, distance);
+                                        y = Mathf.Lerp(
+                                            modifierY,
+                                            y,
+                                            EasingFunctions.Ease(t, modifier.easing)
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -150,9 +152,9 @@ namespace Siren.Scripts.Terrain
                     }
 
                     var position = GetPos(x, z);
-                    vertices[i] = position;
+                    vertices[vertexIndex] = position;
 
-                    uv[i] = new Vector2((float) x / chunkResolution, (float) z / chunkResolution);
+                    uv[vertexIndex] = new Vector2((float) x / chunkResolution, (float) z / chunkResolution);
 
                     var n = GetPos(x, z + 1) - position;
                     var e = GetPos(x + 1, z) - position;
@@ -168,9 +170,9 @@ namespace Siren.Scripts.Terrain
                     
                     normal.Normalize();
 
-                    normals[i] = normal;
+                    normals[vertexIndex] = normal;
 
-                    i++;
+                    vertexIndex++;
                 }
             }
 
