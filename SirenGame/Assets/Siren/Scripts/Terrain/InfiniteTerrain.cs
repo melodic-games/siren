@@ -92,10 +92,9 @@ namespace Siren.Scripts.Terrain
             _lastPlayerPosition = new Vector2Int(999, 999);
 
             // TODO: chunk size changes doesnt work with reload all chunks 
-            
+
             // DeleteAllChunks();
             ReloadAllChunks();
-            
         }
 
         public InfiniteTerrainAreaModifier[] GetAreaModifiersInBounds(Bounds bounds)
@@ -254,7 +253,18 @@ namespace Siren.Scripts.Terrain
                 }
             }
 
-            // TODO: remove chunks not required
+            // remove chunks not required
+
+            lock (_chunksLock)
+            {
+                var chunks = _chunks.Values.ToArray();
+                foreach (var chunk in chunks)
+                {
+                    if (_currentSortedChunkPositions.Contains(chunk.chunkPosition)) continue;
+                    Destroy(chunk.gameObject);
+                    _chunks.Remove(chunk.chunkPosition);
+                }
+            }
         }
     }
 }
