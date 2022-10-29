@@ -12,7 +12,7 @@ namespace Siren.Scripts.Terrain
     public class InfiniteTerrain : MonoBehaviour
     {
         // TODO: setting view distance too high makes lag
-        
+
         [Header("General"), Range(1, 32f)] public int viewDistance = 4;
         public Transform playerCharacterTransform;
         public Material terrainMaterial;
@@ -255,6 +255,8 @@ namespace Siren.Scripts.Terrain
         public void UpdateFn()
         {
             var playerChunkPosition = GetPlayerChunkPosition();
+            var playedMovedChunk = false;
+
             if (playerChunkPosition != _lastPlayerPosition)
             {
                 var currentSortedChunkPositions = GetSpiralChunkPositionsAroundPlayer(playerChunkPosition);
@@ -264,6 +266,7 @@ namespace Siren.Scripts.Terrain
                 }
 
                 _lastPlayerPosition = playerChunkPosition;
+                playedMovedChunk = true;
             }
 
             // search around player with view distance
@@ -292,19 +295,22 @@ namespace Siren.Scripts.Terrain
 
             // remove chunks not required
 
-            InfiniteTerrainChunk[] chunks;
-            lock (_chunksLock)
+            if (playedMovedChunk)
             {
-                chunks = _chunks.Values.ToArray();
-            }
-
-            foreach (var chunk in chunks)
-            {
-                if (_currentSortedChunkPositions.Contains(chunk.chunkPosition)) continue;
-                DestroyChunk(chunk);
+                InfiniteTerrainChunk[] chunks;
                 lock (_chunksLock)
                 {
-                    _chunks.Remove(chunk.chunkPosition);
+                    chunks = _chunks.Values.ToArray();
+                }
+
+                foreach (var chunk in chunks)
+                {
+                    if (_currentSortedChunkPositions.Contains(chunk.chunkPosition)) continue;
+                    DestroyChunk(chunk);
+                    lock (_chunksLock)
+                    {
+                        _chunks.Remove(chunk.chunkPosition);
+                    }
                 }
             }
         }
