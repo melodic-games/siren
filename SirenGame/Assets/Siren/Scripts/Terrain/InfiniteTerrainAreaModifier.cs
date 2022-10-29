@@ -54,9 +54,12 @@ namespace Siren.Scripts.Terrain
             return _bounds;
         }
 
-        public float DistanceFrom(Vector3 position)
+        public float XZDistanceFrom(Vector3 position)
         {
-            return Vector3.Distance(_position, position);
+            return Vector3.Distance(
+                new Vector3(_position.x, 0, _position.z),
+                new Vector3(position.x, 0, position.z)
+            );
         }
 
         public void OnDrawGizmos()

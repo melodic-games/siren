@@ -108,7 +108,7 @@ namespace Siren.Scripts.Terrain
                         {
                             var modifier = areaModifiers[0];
 
-                            var distance = modifier.DistanceFrom(worldPosition);
+                            var distance = modifier.XZDistanceFrom(worldPosition);
                             var totalRadius = modifier.radius + modifier.falloff;
 
                             if (distance < totalRadius)
