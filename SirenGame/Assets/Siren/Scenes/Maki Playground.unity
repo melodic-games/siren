@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2699.5078, g: 2769.414, b: 4127.2812, a: 1}
+  m_IndirectSpecularColor: {r: 2735.5469, g: 2765.793, b: 3959.3906, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -153,12 +153,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   infiniteTerrain: {fileID: 2104520411}
-  radius: 200
+  radius: 600
   falloff: 2500
   easing: 35
   blendMode: 0
-  noiseSize: 0.01
-  noiseHeight: 7
+  noiseSize: 0.00967
+  noiseHeight: 5
 --- !u!4 &44954053
 Transform:
   m_ObjectHideFlags: 0
@@ -167,7 +167,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 44954051}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4561, y: 907, z: 1914}
+  m_LocalPosition: {x: -4598, y: 287, z: 1991}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -710,10 +710,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   motor: {fileID: 548559967}
-  maxStableMoveSpeed: 15
+  maxStableMoveSpeed: 150
   stableMovementSharpness: 1
   orientationSharpness: 10
-  maxAirMoveSpeed: 15
+  maxAirMoveSpeed: 150
   airAccelerationSpeed: 1
   drag: 1
   allowJumpingWhenSliding: 0
@@ -1278,6 +1278,57 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1742982715}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1770549988
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1770549990}
+  - component: {fileID: 1770549989}
+  m_Layer: 0
+  m_Name: Infinite Terrain Area Modifier (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1770549989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770549988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b033f5a680b84a4eb3a4b2cba2e17b3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  infiniteTerrain: {fileID: 2104520411}
+  radius: 600
+  falloff: 2500
+  easing: 35
+  blendMode: 0
+  noiseSize: 0.00967
+  noiseHeight: 5
+--- !u!4 &1770549990
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770549988}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3843, y: 287, z: 1099}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1823688464
 GameObject:
   m_ObjectHideFlags: 0
@@ -1654,3 +1705,4 @@ MonoBehaviour:
   areaModifiers:
   - {fileID: 1136912900}
   - {fileID: 44954052}
+  - {fileID: 1770549989}

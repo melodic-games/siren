@@ -20,7 +20,7 @@ namespace Siren.Scripts.Terrain
         }
 
         public BlendMode blendMode = BlendMode.Replace;
-        
+
         [Header("Noise"), Range(0.01f, 0.001f)]
         public float noiseSize = 0.005f;
 
@@ -77,6 +77,8 @@ namespace Siren.Scripts.Terrain
 
         public void OnDrawGizmos()
         {
+            var position = transform.position;
+
             const int steps = 8;
 
             for (var i = 0; i < steps + 1; i++)
@@ -85,7 +87,14 @@ namespace Siren.Scripts.Terrain
                 var color = Color.HSVToRGB(t, 1, 1);
                 // color.a = 1f - t;
                 Gizmos.color = color;
-                GizmoUtils.DrawFlatCircleGizmo(transform.position, radius + t * falloff);
+                GizmoUtils.DrawFlatCircleGizmo(
+                    Vector3.Lerp(
+                        position,
+                        new Vector3(position.x, 0, position.z),
+                        EasingFunctions.Ease(t, easing)
+                    ),
+                    radius + t * falloff
+                );
             }
 
             // GizmoUtils.DrawBounds(_bounds);
