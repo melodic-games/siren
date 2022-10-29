@@ -84,69 +84,73 @@ namespace Siren.Scripts.Terrain
 
             var areaModifiers = infiniteTerrain.GetAreaModifiersInBounds(bounds);
 
+            float GetY(int x, int z)
+            {
+                var y = GetNoise(
+                    x * squareSize,
+                    z * squareSize,
+                    infiniteTerrain.noiseSize,
+                    infiniteTerrain.noiseHeight
+                );
+
+                if (areaModifiers.Length <= 0) return y;
+
+                var worldPosition = chunkWorldPosition + new Vector3(
+                    x * squareSize - halfAChunk,
+                    0,
+                    z * squareSize - halfAChunk
+                );
+
+                foreach (var modifier in areaModifiers)
+                {
+                    var distance = modifier.XZDistanceFrom(worldPosition);
+                    var totalRadius = modifier.radius + modifier.falloff;
+                    //modifier.blendMode
+
+                    // break out when we're not in the modifier
+                    if (distance > totalRadius) break;
+
+                    // we're in radius + falloff
+
+                    var modifierY = GetNoise(
+                        x * squareSize,
+                        z * squareSize,
+                        modifier.noiseSize,
+                        modifier.noiseHeight
+                    );
+
+                    modifierY += modifier.GetPosition().y;
+
+                    if (distance < modifier.radius)
+                    {
+                        // in radius
+                        y = modifierY;
+                    }
+                    else
+                    {
+                        // in falloff
+                        var t = Mathf.InverseLerp(modifier.radius, totalRadius, distance);
+                        y = Mathf.Lerp(
+                            modifierY,
+                            y,
+                            EasingFunctions.Ease(t, modifier.easing)
+                        );
+                    }
+                }
+
+                return y;
+            }
+
             var vertexIndex = 0;
             for (var z = 0; z <= chunkResolution; z++)
             {
                 for (var x = 0; x <= chunkResolution; x++)
                 {
-                    var worldPosition = chunkWorldPosition + new Vector3(
-                        x * squareSize - halfAChunk,
-                        0,
-                        z * squareSize - halfAChunk
-                    );
-
                     Vector3 GetPos(int queryX, int queryZ)
                     {
-                        var y = GetNoise(
-                            queryX * squareSize,
-                            queryZ * squareSize,
-                            infiniteTerrain.noiseSize,
-                            infiniteTerrain.noiseHeight
-                        );
-
-                        if (areaModifiers.Length > 0)
-                        {
-                            foreach (var modifier in areaModifiers)
-                            {
-                                var distance = modifier.XZDistanceFrom(worldPosition);
-                                var totalRadius = modifier.radius + modifier.falloff;
-                                //modifier.blendMode
-                        
-                                if (distance < totalRadius)
-                                {
-                                    // we're in radius + falloff
-                        
-                                    var modifierY = GetNoise(
-                                        queryX * squareSize,
-                                        queryZ * squareSize,
-                                        modifier.noiseSize,
-                                        modifier.noiseHeight
-                                    );
-                        
-                                    modifierY += modifier.GetPosition().y;
-                        
-                                    if (distance < modifier.radius)
-                                    {
-                                        // in radius
-                                        y = modifierY;
-                                    }
-                                    else
-                                    {
-                                        // in falloff
-                                        var t = Mathf.InverseLerp(modifier.radius, totalRadius, distance);
-                                        y = Mathf.Lerp(
-                                            modifierY,
-                                            y,
-                                            EasingFunctions.Ease(t, modifier.easing)
-                                        );
-                                    }
-                                }
-                            }
-                        }
-
                         return new Vector3(
                             queryX * squareSize - halfAChunk,
-                            y,
+                            GetY(queryX, queryZ),
                             queryZ * squareSize - halfAChunk
                         );
                     }
@@ -156,18 +160,17 @@ namespace Siren.Scripts.Terrain
 
                     uv[vertexIndex] = new Vector2((float) x / chunkResolution, (float) z / chunkResolution);
 
-                    var n = GetPos(x, z + 1) - position;
-                    var e = GetPos(x + 1, z) - position;
-                    var w = GetPos(x - 1, z) - position;
-                    var s = GetPos(x, z - 1) - position;
+                    var queryN = GetPos(x, z + 1) - position;
+                    var queryE = GetPos(x + 1, z) - position;
+                    var queryW = GetPos(x - 1, z) - position;
+                    var queryS = GetPos(x, z - 1) - position;
 
-                    var normal = (
-                        Vector3.Cross(n, e) +
-                        Vector3.Cross(e, s) +
-                        Vector3.Cross(s, w) +
-                        Vector3.Cross(w, n)
-                    );
-                    
+                    var normal =
+                        Vector3.Cross(queryN, queryE) +
+                        Vector3.Cross(queryE, queryS) +
+                        Vector3.Cross(queryS, queryW) +
+                        Vector3.Cross(queryW, queryN);
+
                     normal.Normalize();
 
                     normals[vertexIndex] = normal;
