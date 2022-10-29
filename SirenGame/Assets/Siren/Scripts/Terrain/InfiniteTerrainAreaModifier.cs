@@ -79,14 +79,16 @@ namespace Siren.Scripts.Terrain
         {
             var position = transform.position;
 
-            const int steps = 8;
+            // var steps = falloff / 16f;
+            const int steps = 16;
 
             for (var i = 0; i < steps + 1; i++)
             {
-                var t = (float) i / (steps);
+                var t = (float) i / steps;
+
                 var color = Color.HSVToRGB(t, 1, 1);
-                // color.a = 1f - t;
                 Gizmos.color = color;
+
                 GizmoUtils.DrawFlatCircleGizmo(
                     Vector3.Lerp(
                         position,
