@@ -83,7 +83,7 @@ namespace Siren.Scripts.Terrain
                 new Vector3(chunkSize, 1, chunkSize)
             );
 
-            var areaModifiers = infiniteTerrain.GetAreaModifiersInBounds(bounds);
+            var areaModifiers = infiniteTerrain.GetAreaModifiersInBoundsOrdered(bounds);
 
             float GetY(int x, int z)
             {

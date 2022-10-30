@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2732.1094, g: 2768.871, b: 3988.3047, a: 1}
+  m_IndirectSpecularColor: {r: 2713.3262, g: 2772.332, b: 4087.3047, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 44954053}
   - component: {fileID: 44954052}
   m_Layer: 0
-  m_Name: Infinite Terrain Area Modifier (1)
+  m_Name: Infinite Terrain Area Modifier
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -152,11 +152,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b033f5a680b84a4eb3a4b2cba2e17b3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  infiniteTerrain: {fileID: 2104520411}
   radius: 600
   falloff: 2500
   easing: 35
   blendMode: 0
+  blendOrderIndex: 10
   noiseSize: 0.00967
   noiseHeight: 0.1
 --- !u!4 &44954053
@@ -167,12 +167,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 44954051}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3547, y: 690, z: 3786}
+  m_LocalPosition: {x: -3538, y: 793, z: 3802}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &157207112
 GameObject:
@@ -486,7 +486,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &258636517
 GameObject:
@@ -901,7 +901,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1115201809
 GameObject:
@@ -998,7 +998,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1136912898
 GameObject:
@@ -1044,11 +1044,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b033f5a680b84a4eb3a4b2cba2e17b3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  infiniteTerrain: {fileID: 2104520411}
   radius: 900
   falloff: 3000
   easing: 17
   blendMode: 0
+  blendOrderIndex: 0
   noiseSize: 0.01
   noiseHeight: 7
 --- !u!1 &1437528079
@@ -1193,7 +1193,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1742982715
 GameObject:
@@ -1289,7 +1289,7 @@ GameObject:
   - component: {fileID: 1770549990}
   - component: {fileID: 1770549989}
   m_Layer: 0
-  m_Name: Infinite Terrain Area Modifier (2)
+  m_Name: Infinite Terrain Area Modifier
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1307,11 +1307,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b033f5a680b84a4eb3a4b2cba2e17b3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  infiniteTerrain: {fileID: 2104520411}
   radius: 600
   falloff: 2500
   easing: 35
   blendMode: 0
+  blendOrderIndex: 0
   noiseSize: 0.00967
   noiseHeight: 0.1
 --- !u!4 &1770549990
@@ -1322,7 +1322,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1770549988}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4259, y: 537, z: 3033}
+  m_LocalPosition: {x: -4259, y: 482, z: 3033}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1702,7 +1702,3 @@ MonoBehaviour:
   chunkResolution: 100
   noiseSize: 0.0037
   noiseHeight: 11
-  areaModifiers:
-  - {fileID: 1136912900}
-  - {fileID: 44954052}
-  - {fileID: 1770549989}

@@ -1,4 +1,5 @@
-﻿using Siren.Scripts.UI;
+﻿using System;
+using Siren.Scripts.UI;
 using Siren.Scripts.Utils;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace Siren.Scripts.Terrain
     [ExecuteInEditMode]
     public class InfiniteTerrainAreaModifier : MonoBehaviour
     {
-        public InfiniteTerrain infiniteTerrain;
+        private InfiniteTerrain _infiniteTerrain;
 
         [Header("Modifier")] public float radius = 4;
         public float falloff = 2;
@@ -21,6 +22,8 @@ namespace Siren.Scripts.Terrain
 
         public BlendMode blendMode = BlendMode.Replace;
 
+        public int blendOrderIndex = 0;
+
         [Header("Noise"), Range(0.01f, 0.001f)]
         public float noiseSize = 0.005f;
 
@@ -30,10 +33,30 @@ namespace Siren.Scripts.Terrain
 
         private Bounds _bounds;
 
-        public void OnEnable()
+        private void OnEnable()
         {
             _position = transform.position;
             UpdateBounds();
+
+            var infiniteTerrain = FindObjectOfType<InfiniteTerrain>();
+            if (infiniteTerrain != null) infiniteTerrain.ReloadAllAreaModifiers();
+        }
+
+        private void OnDisable()
+        {
+            var infiniteTerrain = FindObjectOfType<InfiniteTerrain>();
+            if (infiniteTerrain != null) infiniteTerrain.ReloadAllAreaModifiers();
+        }
+
+        public void SetInfiniteTerrain(InfiniteTerrain infiniteTerrain)
+        {
+            _infiniteTerrain = infiniteTerrain;
+        }
+
+        private void ReloadAllChunks()
+        {
+            if (_infiniteTerrain == null) return;
+            _infiniteTerrain.ReloadAllChunks();
         }
 
         private void Update()
@@ -41,14 +64,14 @@ namespace Siren.Scripts.Terrain
             if (Vector3.Distance(_position, transform.position) < 0.01f) return;
 
             _position = transform.position;
-            infiniteTerrain.ReloadAllChunks();
+            ReloadAllChunks();
 
             UpdateBounds();
         }
 
         private void OnValidate()
         {
-            infiniteTerrain.ReloadAllChunks();
+            ReloadAllChunks();
         }
 
         private void UpdateBounds()

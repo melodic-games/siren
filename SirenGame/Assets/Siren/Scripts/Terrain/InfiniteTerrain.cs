@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace Siren.Scripts.Terrain
         [Range(0.01f, 0.001f)] public float noiseSize = 0.005f;
         [Range(0.1f, 100f)] public float noiseHeight = 10;
 
-        [Header("Area Modifiers")] public InfiniteTerrainAreaModifier[] areaModifiers;
+        private InfiniteTerrainAreaModifier[] _areaModifiers;
 
         private readonly Dictionary<Vector2Int, InfiniteTerrainChunk> _chunks = new();
         private readonly object _chunksLock = new();
@@ -51,6 +52,9 @@ namespace Siren.Scripts.Terrain
             {
                 thread.Start();
             }
+
+            // dont reload chunks since we're initializing here
+            ReloadAllAreaModifiers(false);
 
 #if UNITY_EDITOR
             if (!EditorApplication.isPlaying)
@@ -79,7 +83,25 @@ namespace Siren.Scripts.Terrain
                 }
             }
 
+            _areaModifiers = Array.Empty<InfiniteTerrainAreaModifier>();
+
             DeleteAllChunks();
+        }
+
+        public void ReloadAllAreaModifiers(bool reloadChunks = true)
+        {
+            _areaModifiers = FindObjectsOfType<InfiniteTerrainAreaModifier>()
+                .Where(modifier => modifier.isActiveAndEnabled).ToArray();
+
+            foreach (var modifier in _areaModifiers)
+            {
+                modifier.SetInfiniteTerrain(this);
+            }
+
+            if (reloadChunks)
+            {
+                ReloadAllChunks();
+            }
         }
 
         private void DestroyChunk(InfiniteTerrainChunk chunk)
@@ -133,10 +155,11 @@ namespace Siren.Scripts.Terrain
             ReloadAllChunks();
         }
 
-        public InfiniteTerrainAreaModifier[] GetAreaModifiersInBounds(Bounds bounds)
+        public InfiniteTerrainAreaModifier[] GetAreaModifiersInBoundsOrdered(Bounds bounds)
         {
-            return areaModifiers
+            return _areaModifiers
                 .Where(m => m.GetBounds().Intersects(bounds))
+                .OrderBy(m => m.blendOrderIndex)
                 .ToArray();
         }
 
@@ -186,9 +209,10 @@ namespace Siren.Scripts.Terrain
                 }
             }
 
-            chunkPositions.Sort((a, b) => a.Item2.CompareTo(b.Item2));
-
-            return chunkPositions.Select(tuple => tuple.Item1).ToArray();
+            return chunkPositions
+                .OrderBy(p => p.Item2)
+                .Select(tuple => tuple.Item1)
+                .ToArray();
         }
 
         private InfiniteTerrainChunk CreateChunkGameObject(Vector2Int chunkPosition)
