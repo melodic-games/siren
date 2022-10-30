@@ -2,31 +2,30 @@
 using Siren.Scripts.UI;
 using Siren.Scripts.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Siren.Scripts.Terrain
 {
+    public enum AreaModifierBlendMode
+    {
+        Add,
+        Replace
+    }
+
     [ExecuteInEditMode]
     public class InfiniteTerrainAreaModifier : MonoBehaviour
     {
         private InfiniteTerrain _infiniteTerrain;
 
-        [Header("Modifier")] public float radius = 4;
+        [Header("Dimensions")] public float radius = 4;
         public float falloff = 2;
-        public EasingFunctions.Easing easing = EasingFunctions.Easing.InOutSine;
 
-        public enum BlendMode
-        {
-            Add,
-            Replace
-        }
-
-        public BlendMode blendMode = BlendMode.Replace;
-
+        [Header("Shape")] public EasingFunctions.Easing falloffEasing = EasingFunctions.Easing.InOutSine;
+        public AreaModifierBlendMode blendMode = AreaModifierBlendMode.Replace;
         public int blendOrderIndex = 0;
 
         [Header("Noise"), Range(0.01f, 0.001f)]
         public float noiseSize = 0.005f;
-
         [Range(0.1f, 300f)] public float noiseHeight = 10;
 
         private Vector3 _position;
@@ -120,7 +119,7 @@ namespace Siren.Scripts.Terrain
                     Vector3.Lerp(
                         position,
                         new Vector3(position.x, 0, position.z),
-                        EasingFunctions.Ease(t, easing)
+                        EasingFunctions.Ease(t, falloffEasing)
                     ),
                     radius + t * falloff
                 );

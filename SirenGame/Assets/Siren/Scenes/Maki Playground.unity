@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2713.3262, g: 2772.332, b: 4087.3047, a: 1}
+  m_IndirectSpecularColor: {r: 2739.9941, g: 2737.6797, b: 3825.3281, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -154,8 +154,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 600
   falloff: 2500
-  easing: 35
-  blendMode: 0
+  falloffEasing: 35
+  blendMode: 1
   blendOrderIndex: 10
   noiseSize: 0.00967
   noiseHeight: 0.1
@@ -1025,7 +1025,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1136912898}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3181, y: 2489, z: -2170}
+  m_LocalPosition: {x: 3181, y: 797, z: -2170}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1044,10 +1044,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b033f5a680b84a4eb3a4b2cba2e17b3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 900
-  falloff: 3000
-  easing: 17
-  blendMode: 0
+  radius: 200
+  falloff: 4000
+  falloffEasing: 34
+  blendMode: 1
   blendOrderIndex: 0
   noiseSize: 0.01
   noiseHeight: 7
@@ -1309,8 +1309,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 600
   falloff: 2500
-  easing: 35
-  blendMode: 0
+  falloffEasing: 35
+  blendMode: 1
   blendOrderIndex: 0
   noiseSize: 0.00967
   noiseHeight: 0.1

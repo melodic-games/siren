@@ -134,7 +134,7 @@ namespace Siren.Scripts.Terrain
                         y = Mathf.Lerp(
                             modifierY,
                             y,
-                            EasingFunctions.Ease(t, modifier.easing)
+                            EasingFunctions.Ease(t, modifier.falloffEasing)
                         );
                     }
                 }
