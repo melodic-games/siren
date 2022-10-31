@@ -67,27 +67,27 @@ float3 OceanSpecular(float3 N, float3 L, float3 V)
     return specular * _OceanSpecularColor;
 }
 
-float3 GlitterSpecular(float3 N, float3 L, float3 V, Input i)
-{
-    // random glitter direction
-    float3 G = normalize(float3(
-        snoise(i.WorldPos * _GlitterSize + float3(1349, 6391, 2465)),
-        snoise(i.WorldPos * _GlitterSize + float3(7827, 2945, 5698)),
-        snoise(i.WorldPos * _GlitterSize + float3(5282, 4216, 3212))
-    ));
-
-    // light that reflects on the glitter and hits the eye
-    float3 R = reflect(L, G);
-    float RdotV = max(0, dot(R, V));
-
-    // only the strong ones (= small RdotV)
-    if (RdotV > _GlitterThreshold)
-    {
-        return 0;
-    }
-
-    return (1 - RdotV) * _GlitterColor;
-}
+// float3 GlitterSpecular(float3 N, float3 L, float3 V, Input i)
+// {
+//     // random glitter direction
+//     float3 G = normalize(float3(
+//         snoise(i.WorldPos * _GlitterSize + float3(1349, 6391, 2465)),
+//         snoise(i.WorldPos * _GlitterSize + float3(7827, 2945, 5698)),
+//         snoise(i.WorldPos * _GlitterSize + float3(5282, 4216, 3212))
+//     ));
+//
+//     // light that reflects on the glitter and hits the eye
+//     float3 R = reflect(L, G);
+//     float RdotV = max(0, dot(R, V));
+//
+//     // only the strong ones (= small RdotV)
+//     if (RdotV > _GlitterThreshold)
+//     {
+//         return 0;
+//     }
+//
+//     return (1 - RdotV) * _GlitterColor;
+// }
 
 float3 LightingJourney(Input i)
 {
