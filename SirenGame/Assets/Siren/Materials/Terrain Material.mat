@@ -365,7 +365,7 @@ Material:
     - _OceanSpecularColor: {r: 1, g: 0.74171203, b: 0.5801887, a: 0}
     - _RimColor: {r: 1, g: 0.5223464, b: 0.25, a: 0}
     - _SandColor: {r: 1, g: 1, b: 1, a: 0}
-    - _ShadowColor: {r: 0.8113208, g: 0, b: 0, a: 1}
+    - _ShadowColor: {r: 0.7058824, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _TerrainColor: {r: 1, g: 0.04843244, b: 0, a: 0}
     - _ThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
