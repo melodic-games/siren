@@ -260,7 +260,7 @@ Material:
     - _GlitterThreshold: 0
     - _GrainIntensity: 1.5
     - _GrainSize: 16
-    - _GrainStrength: 0.1
+    - _GrainStrength: 0.02
     - _GrainStrength_1: 1.5
     - _HeightAmplitude: 0.02
     - _HeightCenter: 0.5
@@ -362,12 +362,12 @@ Material:
     - _InvPrimScale: {r: 1, g: 1, b: 0, a: 0}
     - _IridescenceThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _OceanColor: {r: 0, g: 0, b: 0, a: 0}
-    - _OceanSpecularColor: {r: 1, g: 0.74171203, b: 0.5801887, a: 0}
-    - _RimColor: {r: 1, g: 0.5223464, b: 0.25, a: 0}
+    - _OceanSpecularColor: {r: 1, g: 0.78435, b: 0.773, a: 0}
+    - _RimColor: {r: 1, g: 0.5632323, b: 0.5399999, a: 1}
     - _SandColor: {r: 1, g: 1, b: 1, a: 0}
-    - _ShadowColor: {r: 0.7058824, g: 0, b: 0, a: 1}
+    - _ShadowColor: {r: 0.35499996, g: 0.17826176, b: 0.16912013, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
-    - _TerrainColor: {r: 1, g: 0.04843244, b: 0, a: 0}
+    - _TerrainColor: {r: 0.9137255, g: 0.5436217, b: 0.5244784, a: 1}
     - _ThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
     - _TransmittanceColor: {r: 1, g: 1, b: 1, a: 1}
     - _UVDetailsMappingMask: {r: 1, g: 0, b: 0, a: 0}

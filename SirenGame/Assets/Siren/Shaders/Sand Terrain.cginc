@@ -54,7 +54,6 @@ v2f vert(appdata_full v)
 
     UNITY_INITIALIZE_OUTPUT(v2f, o);
     
-    // o.pos = UnityObjectToClipPos(v.vertex);
     o.pos = UnityObjectToClipPos(v.vertex);
     // UNITY_TRANSFER_FOG(o, o.vertex);
     o.uv = v.texcoord.xy;
@@ -90,9 +89,10 @@ float3 nlerp(float3 n1, float3 n2, float t)
 float3 DiffuseColor(float3 N, float3 L, float attenuation)
 {
     N.y *= 0.3;
+    //float NdotL = saturate(4 * dot(N, L));
     float NdotL = saturate(4 * dot(N, L));
     
-    float3 color = lerp(_ShadowColor, _TerrainColor, lerp(NdotL, 1, attenuation));
+    float3 color = lerp(_ShadowColor, _TerrainColor, NdotL * attenuation);
     return color;
 }
 
@@ -139,7 +139,8 @@ float3 LightingJourney(v2f i, float3 N)
 {
     UNITY_LIGHT_ATTENUATION(attenuation, i, i.worldPos);
     
-    float3 L = normalize(_WorldSpaceLightPos0.xyz - i.worldPos.xyz);
+    //float3 L = normalize(_WorldSpaceLightPos0.xyz - i.worldPos.xyz);
+    float3 L = normalize(_WorldSpaceLightPos0.xyz);
     // float3 N = i.normal;
     float3 V = i.viewDir;
 
@@ -212,8 +213,9 @@ fixed4 frag(v2f i) : SV_Target
     N = SandNormal(N, i.worldPos);
     
     fixed4 color = fixed4(LightingJourney(i, N), 1);
-
-    UNITY_APPLY_FOG(i.fogCoord, col);
+    
+    
+    UNITY_APPLY_FOG(i.fogCoord, color);
     return color;
 }
 
