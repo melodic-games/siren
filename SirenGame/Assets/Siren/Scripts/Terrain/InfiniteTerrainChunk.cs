@@ -106,12 +106,8 @@ namespace Siren.Scripts.Terrain
                 {
                     var distance = modifier.XZDistanceFrom(worldPosition);
                     var totalRadius = modifier.radius + modifier.falloff;
-                    //modifier.blendMode
-
-                    // break out when we're not in the modifier
-                    if (distance > totalRadius) break;
-
-                    // we're in radius + falloff
+                    
+                    // modifier.blendMode
 
                     var modifierY = GetNoise(
                         x * squareSize,
@@ -129,7 +125,7 @@ namespace Siren.Scripts.Terrain
                     }
                     else
                     {
-                        // in falloff
+                        // in falloff and bounding box
                         var t = Mathf.InverseLerp(modifier.radius, totalRadius, distance);
                         y = Mathf.Lerp(
                             modifierY,
