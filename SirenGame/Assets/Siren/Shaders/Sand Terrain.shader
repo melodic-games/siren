@@ -22,7 +22,9 @@ Shader "Siren/Sand Terrain"
         [Header(Grain)]
         [Space(5)]
         _GrainSize ("Size", float) = 16
-        _GrainStrength ("Strength", float) = 0.1
+        _GrainStrength ("Strength", Range(0, 1)) = 0.1
+        _GrainFalloffPower ("Falloff Power", range(0, 1)) = 0.1
+        _GrainFalloffDistance ("Falloff Distance", range(0, 10000)) = 1000
 
         [Header(Ripple)]
         [Space(5)]

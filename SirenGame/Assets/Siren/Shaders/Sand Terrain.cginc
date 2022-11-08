@@ -1,16 +1,12 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-#ifndef SAND_TERRAIN_INCLUDE
+﻿#ifndef SAND_TERRAIN_INCLUDE
 #define SAND_TERRAIN_INCLUDE
 
 #include "UnityCG.cginc"
 #include "Lighting.cginc"
 #include "Snoise.cginc"
 #include "AutoLight.cginc"
+
+#define invLerp(from, to, t) (t - from) / (to - from)
 
 struct v2f
 {
@@ -37,6 +33,8 @@ float _RimPower;
 
 float _GrainSize;
 float _GrainStrength;
+float _GrainFalloffPower;
+float _GrainFalloffDistance;
 
 float4 _OceanSpecularColor;
 float _OceanSpecularStrength;
@@ -193,6 +191,7 @@ float3 RipplesNormal(float3 N, v2f i)
 float3 SandNormal(float3 N, float3 worldPos)
 {
     // -1 to 1
+    
     float3 random = float3(
         snoise(worldPos * _GrainSize + float3(1349, 6391, 2465)),
         snoise(worldPos * _GrainSize + float3(7827, 2945, 5698)),
@@ -201,7 +200,12 @@ float3 SandNormal(float3 N, float3 worldPos)
 
     float3 S = normalize(random);
 
-    float3 Ns = nlerp(N, S, _GrainStrength);
+    float d = clamp(
+        1 - pow(invLerp(0, _GrainFalloffDistance, distance(_WorldSpaceCameraPos, worldPos)), _GrainFalloffPower),
+        0, 1
+    );
+    
+    float3 Ns = nlerp(N, S, d * _GrainStrength);
 
     return Ns;
 }
@@ -213,7 +217,9 @@ fixed4 frag(v2f i) : SV_Target
     N = SandNormal(N, i.worldPos);
     
     fixed4 color = fixed4(LightingJourney(i, N), 1);
-    
+
+    // float d = clamp(1 - invLerp(0, 500, distance(_WorldSpaceCameraPos, i.worldPos)), 0.2, 1);
+    // fixed4 color = fixed4(d, d, d, 0);
     
     UNITY_APPLY_FOG(i.fogCoord, color);
     return color;
