@@ -99,35 +99,45 @@ namespace Siren.Scripts.Terrain
                     z
                 );
 
-                foreach (var modifier in areaModifiers)
+                foreach (var mod in areaModifiers)
                 {
-                    var distance = modifier.XZDistanceFrom(worldPosition);
-                    var totalRadius = modifier.radius + modifier.falloff;
+                    var distance = mod.XZDistanceFrom(worldPosition);
+                    var totalRadius = mod.radius + mod.falloff;
                     
                     // modifier.blendMode
 
-                    var modifierY = GetNoise(
-                        x + modifier.noiseOffset.x,
-                        z + modifier.noiseOffset.y,
-                        modifier.noiseSize,
-                        modifier.noiseHeight
+                    var modifierPosition = mod.GetPosition();
+
+                    var modX = x + mod.noiseOffset.x;
+                    var modZ = z + mod.noiseOffset.y;
+                    if (mod.noiseShouldFollow)
+                    {
+                        modX -= modifierPosition.x;
+                        modZ -= modifierPosition.z;
+                    }
+                    
+                    var modY = GetNoise(
+                        modX,
+                        modZ,
+                        mod.noiseSize,
+                        mod.noiseHeight
                     );
 
-                    modifierY += modifier.GetPosition().y;
+                    modY += modifierPosition.y;
 
-                    if (distance < modifier.radius)
+                    if (distance < mod.radius)
                     {
                         // in radius
-                        y = modifierY;
+                        y = modY;
                     }
                     else
                     {
                         // in falloff and bounding box
-                        var t = Mathf.InverseLerp(modifier.radius, totalRadius, distance);
+                        var t = Mathf.InverseLerp(mod.radius, totalRadius, distance);
                         y = Mathf.Lerp(
-                            modifierY,
+                            modY,
                             y,
-                            EasingFunctions.Ease(t, modifier.falloffEasing)
+                            EasingFunctions.Ease(t, mod.falloffEasing)
                         );
                     }
                 }

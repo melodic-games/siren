@@ -1,4 +1,5 @@
-﻿using Siren.Scripts.UI;
+﻿using System;
+using Siren.Scripts.UI;
 using Siren.Scripts.Utils;
 using UnityEngine;
 
@@ -26,6 +27,7 @@ namespace Siren.Scripts.Terrain
         public float noiseSize = 0.005f;
         [Range(0.1f, 300f)] public float noiseHeight = 10;
         public Vector2 noiseOffset;
+        public bool noiseShouldFollow;
         
         private Vector3 _position;
 
