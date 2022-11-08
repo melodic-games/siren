@@ -1,12 +1,9 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Siren.Scripts.UI;
-using Siren.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
-using UnityEngine.Serialization;
 
 namespace Siren.Scripts.Terrain
 {
@@ -69,7 +66,7 @@ namespace Siren.Scripts.Terrain
             var uv = new Vector2[verticesLength];
             var normals = new Vector3[verticesLength];
 
-            var squareSize = chunkSize / (float) chunkResolution;
+            var squareSize = (float) chunkSize / chunkResolution;
 
             var chunkWorldPosition = new Vector3(
                 (float) chunkPosition.x * infiniteTerrain.chunkSize,
@@ -85,11 +82,11 @@ namespace Siren.Scripts.Terrain
 
             var areaModifiers = infiniteTerrain.GetAreaModifiersInBoundsOrdered(bounds);
 
-            float GetY(int x, int z)
+            float GetY(float x, float z)
             {
                 var y = GetNoise(
-                    x * squareSize,
-                    z * squareSize,
+                    x,
+                    z,
                     infiniteTerrain.noiseSize,
                     infiniteTerrain.noiseHeight
                 );
@@ -97,9 +94,9 @@ namespace Siren.Scripts.Terrain
                 if (areaModifiers.Length <= 0) return y;
 
                 var worldPosition = chunkWorldPosition + new Vector3(
-                    x * squareSize - halfAChunk,
+                    x,
                     0,
-                    z * squareSize - halfAChunk
+                    z
                 );
 
                 foreach (var modifier in areaModifiers)
@@ -110,8 +107,8 @@ namespace Siren.Scripts.Terrain
                     // modifier.blendMode
 
                     var modifierY = GetNoise(
-                        x * squareSize + modifier.noiseOffset.x,
-                        z * squareSize + modifier.noiseOffset.y,
+                        x + modifier.noiseOffset.x,
+                        z + modifier.noiseOffset.y,
                         modifier.noiseSize,
                         modifier.noiseHeight
                     );
@@ -145,10 +142,12 @@ namespace Siren.Scripts.Terrain
                 {
                     Vector3 GetPos(int queryX, int queryZ)
                     {
+                        var adjustedX = queryX * squareSize - halfAChunk;
+                        var adjustedZ = queryZ * squareSize - halfAChunk;
                         return new Vector3(
-                            queryX * squareSize - halfAChunk,
-                            GetY(queryX, queryZ),
-                            queryZ * squareSize - halfAChunk
+                            adjustedX,
+                            GetY(adjustedX, adjustedZ),
+                            adjustedZ
                         );
                     }
 

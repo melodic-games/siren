@@ -1,8 +1,6 @@
-﻿using System;
-using Siren.Scripts.UI;
+﻿using Siren.Scripts.UI;
 using Siren.Scripts.Utils;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Siren.Scripts.Terrain
 {
