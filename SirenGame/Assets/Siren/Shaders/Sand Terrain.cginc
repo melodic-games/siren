@@ -119,23 +119,25 @@ float3 OceanSpecular(float3 N, float3 L, float3 V)
 
 float3 LightingJourney(v2f i, float3 N)
 {    
-    //float3 L = normalize(_WorldSpaceLightPos0.xyz - i.worldPos.xyz);
     float3 L = normalize(_WorldSpaceLightPos0.xyz);
     // float3 N = i.normal;
     float3 V = i.viewDir;
 
-    // float3 diffuseColor = DiffuseColor(N, L, attenuation);
     float3 rimColor = RimLighting(N, V);
     float3 oceanColor = OceanSpecular(N, L, V);
     // float3 glitterColor = GlitterSpecular(N, L, V, i);
-
-    
     float3 specularColor = saturate(max(rimColor, oceanColor));
     
     float3 litColor = _TerrainColor + specularColor; // + glitterColor
+
+    // calculate journey lambert shadows and multiply with directional light shadows
     
+    // should we use oren nayer instead?
+    // https://github.com/AtwoodDeng/JourneySand/blob/master/Assets/SandRendering/Shader/SandRenderingShader.shader#L403
     float NdotL = saturate(4 * dot(N * float3(1, 0.3, 1), L));
+    
     UNITY_LIGHT_ATTENUATION(attenuation, i, i.worldPos);
+    
     float3 color = lerp(_ShadowColor, litColor, NdotL * attenuation);
     
     return color;
