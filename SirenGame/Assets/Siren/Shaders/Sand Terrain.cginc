@@ -17,11 +17,7 @@ struct v2f
     float3 normal : TEXCOORD2;
     float4 tangent : TEXCOORD3;
     float3 viewDir : TEXCOORD4;
-    // UNITY_SHADOW_COORDS(5)
-    SHADOW_COORDS(5)
-    // #if defined(SHADOWS_SCREEN)
-    // float4 shadowCoordinates : TEXCOORD5;
-    // #endif
+    UNITY_SHADOW_COORDS(5)
 };
 
 float4 _TerrainColor;
@@ -59,19 +55,8 @@ v2f vert(appdata_full v)
     o.normal = v.normal;
     o.tangent = v.tangent;
     o.viewDir = normalize(_WorldSpaceCameraPos - o.worldPos.xyz);
-
-    // UNITY_TRANSFER_SHADOW(o, o.uv.xy);
-
-// #if defined(SHADOWS_SCREEN)
-//     o.shadowCoordinates = i.position;
-// #endif
+    
     TRANSFER_SHADOW(o);
-    // #if defined(SHADOWS_SCREEN)
-    // o.shadowCoordinates = ComputeScreenPos(o.pos);
-    // #endif
-    //
-    // UNITY_TRANSFER_SHADOW(o, o.uv.xy);
-    // SHADOW_COORDS(5)
     
     return o;
 }
@@ -84,15 +69,14 @@ float3 nlerp(float3 n1, float3 n2, float t)
     return normalize(lerp(n1, n2, t));
 }
 
-float3 DiffuseColor(float3 N, float3 L, float attenuation)
-{
-    N.y *= 0.3;
-    //float NdotL = saturate(4 * dot(N, L));
-    float NdotL = saturate(4 * dot(N, L));
-    
-    float3 color = lerp(_ShadowColor, _TerrainColor, NdotL * attenuation);
-    return color;
-}
+// float3 DiffuseColor(float3 N, float3 L, float attenuation)
+// {
+//     N.y *= 0.3;
+//     float NdotL = saturate(4 * dot(N, L));
+//     
+//     float3 color = lerp(_ShadowColor, _TerrainColor, NdotL * attenuation);
+//     return color;
+// }
 
 float3 RimLighting(float3 N, float3 V)
 {
@@ -134,22 +118,26 @@ float3 OceanSpecular(float3 N, float3 L, float3 V)
 // }
 
 float3 LightingJourney(v2f i, float3 N)
-{
-    UNITY_LIGHT_ATTENUATION(attenuation, i, i.worldPos);
-    
+{    
     //float3 L = normalize(_WorldSpaceLightPos0.xyz - i.worldPos.xyz);
     float3 L = normalize(_WorldSpaceLightPos0.xyz);
     // float3 N = i.normal;
     float3 V = i.viewDir;
 
-    float3 diffuseColor = DiffuseColor(N, L, attenuation);
+    // float3 diffuseColor = DiffuseColor(N, L, attenuation);
     float3 rimColor = RimLighting(N, V);
     float3 oceanColor = OceanSpecular(N, L, V);
     // float3 glitterColor = GlitterSpecular(N, L, V, i);
 
+    
     float3 specularColor = saturate(max(rimColor, oceanColor));
-    float3 color = diffuseColor + specularColor; // + glitterColor
-
+    
+    float3 litColor = _TerrainColor + specularColor; // + glitterColor
+    
+    float NdotL = saturate(4 * dot(N * float3(1, 0.3, 1), L));
+    UNITY_LIGHT_ATTENUATION(attenuation, i, i.worldPos);
+    float3 color = lerp(_ShadowColor, litColor, NdotL * attenuation);
+    
     return color;
 }
 
@@ -211,7 +199,7 @@ float3 SandNormal(float3 N, float3 worldPos)
 }
 
 fixed4 frag(v2f i) : SV_Target
-{    
+{
     float3 N = i.normal;    
     N = RipplesNormal(N, i);
     N = SandNormal(N, i.worldPos);
