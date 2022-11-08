@@ -23,7 +23,7 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 1
+  m_AmbientIntensity: 1.2
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
@@ -159,6 +159,7 @@ MonoBehaviour:
   blendOrderIndex: 20
   noiseSize: 0.00967
   noiseHeight: 0.1
+  noiseOffset: {x: 0, y: 0}
 --- !u!4 &44954053
 Transform:
   m_ObjectHideFlags: 0
@@ -775,6 +776,7 @@ MonoBehaviour:
   blendOrderIndex: 20
   noiseSize: 0.01
   noiseHeight: 7
+  noiseOffset: {x: 0, y: 0}
 --- !u!1 &1437528079
 GameObject:
   m_ObjectHideFlags: 0
@@ -1002,6 +1004,58 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1742982715}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1747094289
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1747094291}
+  - component: {fileID: 1747094290}
+  m_Layer: 0
+  m_Name: Infinite Terrain Area Modifier
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1747094290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747094289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b033f5a680b84a4eb3a4b2cba2e17b3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 60
+  falloff: 54
+  falloffEasing: 17
+  blendMode: 1
+  blendOrderIndex: 0
+  noiseSize: 0.01
+  noiseHeight: 57
+  noiseOffset: {x: -245.12, y: 215.45}
+--- !u!4 &1747094291
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747094289}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 71.1, y: 6.61, z: 128.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 14
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1770549988
 GameObject:
   m_ObjectHideFlags: 0
@@ -1038,6 +1092,7 @@ MonoBehaviour:
   blendOrderIndex: 0
   noiseSize: 0.00751
   noiseHeight: 35
+  noiseOffset: {x: 0, y: 0}
 --- !u!4 &1770549990
 Transform:
   m_ObjectHideFlags: 0
@@ -1293,6 +1348,6 @@ MonoBehaviour:
   playerCharacterTransform: {fileID: 548559969}
   terrainMaterial: {fileID: 2100000, guid: 7a6d40337c889634383565be40c22866, type: 2}
   chunkSize: 1024
-  chunkResolution: 144
+  chunkResolution: 254
   noiseSize: 0.00582
   noiseHeight: 0.1

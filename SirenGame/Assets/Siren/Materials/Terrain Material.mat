@@ -86,6 +86,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: afc0e46bbdadd5146aa31828adde6dff, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _GrainNoiseTexture:
+        m_Texture: {fileID: 2800000, guid: dcad713968858de49bd91a9173013d5c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _HeightMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -258,9 +262,13 @@ Material:
     - _EnergyConservingSpecularColor: 1
     - _GlitterSize: 64
     - _GlitterThreshold: 0
+    - _GrainAnisotropicFalloffDistance: 500
+    - _GrainAnisotropicPower: 0.1
+    - _GrainFalloffDistance: 1000
+    - _GrainFalloffPower: 0.1
     - _GrainIntensity: 1.5
-    - _GrainSize: 16
-    - _GrainStrength: 0.02
+    - _GrainSize: 10
+    - _GrainStrength: 0.1
     - _GrainStrength_1: 1.5
     - _HeightAmplitude: 0.02
     - _HeightCenter: 0.5
@@ -365,7 +373,7 @@ Material:
     - _OceanSpecularColor: {r: 1, g: 0.78435, b: 0.773, a: 0}
     - _RimColor: {r: 1, g: 0.5632323, b: 0.5399999, a: 1}
     - _SandColor: {r: 1, g: 1, b: 1, a: 0}
-    - _ShadowColor: {r: 0.35499996, g: 0.17826176, b: 0.16912013, a: 1}
+    - _ShadowColor: {r: 0.53400004, g: 0.26406598, b: 0.2523297, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _TerrainColor: {r: 0.9137255, g: 0.5436217, b: 0.5244784, a: 1}
     - _ThicknessRemap: {r: 0, g: 1, b: 0, a: 0}
