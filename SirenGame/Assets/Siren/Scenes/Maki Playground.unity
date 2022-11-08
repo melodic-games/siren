@@ -160,6 +160,7 @@ MonoBehaviour:
   noiseSize: 0.00967
   noiseHeight: 0.1
   noiseOffset: {x: 0, y: 0}
+  noiseShouldFollow: 0
 --- !u!4 &44954053
 Transform:
   m_ObjectHideFlags: 0
@@ -777,6 +778,7 @@ MonoBehaviour:
   noiseSize: 0.01
   noiseHeight: 7
   noiseOffset: {x: 0, y: 0}
+  noiseShouldFollow: 0
 --- !u!1 &1437528079
 GameObject:
   m_ObjectHideFlags: 0
@@ -1034,13 +1036,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 60
-  falloff: 54
+  falloff: 97.3
   falloffEasing: 17
   blendMode: 1
   blendOrderIndex: 0
   noiseSize: 0.01
-  noiseHeight: 57
-  noiseOffset: {x: -245.12, y: 215.45}
+  noiseHeight: 32
+  noiseOffset: {x: -386.86, y: 400.1}
+  noiseShouldFollow: 1
 --- !u!4 &1747094291
 Transform:
   m_ObjectHideFlags: 0
@@ -1049,7 +1052,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1747094289}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 71.1, y: 6.61, z: 128.8}
+  m_LocalPosition: {x: -151.2, y: 17.9, z: -105.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1093,6 +1096,7 @@ MonoBehaviour:
   noiseSize: 0.00751
   noiseHeight: 35
   noiseOffset: {x: 0, y: 0}
+  noiseShouldFollow: 0
 --- !u!4 &1770549990
 Transform:
   m_ObjectHideFlags: 0
@@ -1350,4 +1354,4 @@ MonoBehaviour:
   chunkSize: 1024
   chunkResolution: 254
   noiseSize: 0.00582
-  noiseHeight: 0.1
+  noiseHeight: 3.8
