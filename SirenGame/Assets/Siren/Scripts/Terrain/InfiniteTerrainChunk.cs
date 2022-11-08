@@ -110,8 +110,8 @@ namespace Siren.Scripts.Terrain
                     // modifier.blendMode
 
                     var modifierY = GetNoise(
-                        x * squareSize,
-                        z * squareSize,
+                        x * squareSize + modifier.noiseOffset.x,
+                        z * squareSize + modifier.noiseOffset.y,
                         modifier.noiseSize,
                         modifier.noiseHeight
                     );

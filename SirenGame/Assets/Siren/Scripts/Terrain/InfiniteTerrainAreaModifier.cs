@@ -27,7 +27,8 @@ namespace Siren.Scripts.Terrain
         [Header("Noise"), Range(0.01f, 0.001f)]
         public float noiseSize = 0.005f;
         [Range(0.1f, 300f)] public float noiseHeight = 10;
-
+        public Vector2 noiseOffset;
+        
         private Vector3 _position;
 
         private Bounds _bounds;
