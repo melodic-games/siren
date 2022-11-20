@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 870bf5358822d484389a1358ab5d9d16
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _RipplesSteepTexture: {fileID: 2800000, guid: afc0e46bbdadd5146aa31828adde6dff,
+      type: 3}
+  - _RipplesShallowTexture: {fileID: 2800000, guid: 0a4db46a603cdb948be554ac81ff5f20,
+      type: 3}
+  nonModifiableTextures: []
+  preprocessorOverride: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

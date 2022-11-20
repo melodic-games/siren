@@ -178,7 +178,7 @@ float3 RipplesNormal(float3 N, v2f i)
     );
 }
 
-float3 SandNormal(float3 N, float3 worldPos)
+float3 GrainsNormal(float3 N, float3 worldPos)
 {
     // -1 to 1
     
@@ -204,7 +204,7 @@ fixed4 frag(v2f i) : SV_Target
 {
     float3 N = i.normal;    
     N = RipplesNormal(N, i);
-    N = SandNormal(N, i.worldPos);
+    N = GrainsNormal(N, i.worldPos);
     
     fixed4 color = fixed4(LightingJourney(i, N), 1);
 
