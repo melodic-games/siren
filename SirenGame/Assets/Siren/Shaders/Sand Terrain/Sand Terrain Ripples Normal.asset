@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 78b2425a2284af743826c689403a4924, type: 3}
-  m_Name: Amplify Sand Terrain Ripples Normal
+  m_Name: Sand Terrain Ripples Normal
   m_EditorClassIdentifier: 
   m_functionInfo: "// Made with Amplify Shader Editor v1.9.0.2\n// Available at the
     Unity Asset Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=19002\n538;423;1682;976;-880.941;309.4873;1;False;False\nNode;AmplifyShaderEditor.CommentaryNode;41;-435.6282,-414.0541;Inherit;False;1591.599;1069.047;Ripples

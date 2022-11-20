@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Amplify Sand Terrain
+  m_Name: Sand Terrain
   m_Shader: {fileID: 4800000, guid: 870bf5358822d484389a1358ab5d9d16, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
