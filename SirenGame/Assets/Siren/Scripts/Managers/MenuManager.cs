@@ -22,11 +22,11 @@ namespace Siren.Scripts.Managers
         // private const float PauseIconYDistance = 15f;
         private const float PauseIconIntScale = .6f;
 
-        private TweenManager.Tweener _pauseScreenOpacity;
+        private TweenManager.Tweener<float> _pauseScreenOpacity;
         //private TweenManager.Tweener _pauseIconY;
-        private TweenManager.Tweener _pauseIconScale;
+        private TweenManager.Tweener<float> _pauseIconScale;
 
-        private TweenManager.Tweener _timeScale;
+        private TweenManager.Tweener<float> _timeScale;
 
         private SirenInputActions _inputActions;
 
