@@ -78,6 +78,6 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _ExampleName: {r: 0.24999997, g: 0.5, b: 0.5, a: 1}
-    - _LowerColor: {r: 0.9490196, g: 0.79607844, b: 0.57254905, a: 1}
-    - _UpperColor: {r: 0, g: 0, b: 0, a: 1}
+    - _LowerColor: {r: 1, g: 0.8743306, b: 0.724, a: 1}
+    - _UpperColor: {r: 0.88699996, g: 0.7338539, b: 0.51002496, a: 1}
   m_BuildTextureStacks: []
