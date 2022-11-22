@@ -23,7 +23,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SirenBasic
+  m_Name: SirenBasic 1
   m_Shader: {fileID: 4800000, guid: 75e963617a3ce2442b1ccb26bd2b817b, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords:
@@ -56,5 +56,5 @@ Material:
     - __dirty: 0
     m_Colors:
     - _FogColor: {r: 0.84900004, g: 0.5771078, b: 0.421104, a: 0}
-    - _MainColor: {r: 0.688, g: 0.44621822, b: 0.30822402, a: 0}
+    - _MainColor: {r: 0.645, g: 0.05919743, b: 0.041280005, a: 0}
   m_BuildTextureStacks: []

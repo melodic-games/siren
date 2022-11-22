@@ -96,8 +96,8 @@ Material:
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _OceanSpecularPower: 64
-    - _OceanSpecularStrength: 0.5
+    - _OceanSpecularPower: 128
+    - _OceanSpecularStrength: 1
     - _Parallax: 0.02
     - _RimPower: 8
     - _RimStrength: 1
@@ -112,11 +112,11 @@ Material:
     - __dirty: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorShadow: {r: 0.5333333, g: 0.2627447, b: 0.25098, a: 0}
-    - _ColorTerrain: {r: 0.9137255, g: 0.5450979, b: 0.5254902, a: 0}
+    - _ColorShadow: {r: 0.35499996, g: 0.17826176, b: 0.16912013, a: 1}
+    - _ColorTerrain: {r: 0.6666667, g: 0.3788889, b: 0.19999997, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _OceanSpecularColor: {r: 1, g: 0.7843137, b: 0.772549, a: 0}
-    - _RimColor: {r: 1, g: 0.5647059, b: 0.5411765, a: 0}
+    - _OceanSpecularColor: {r: 1, g: 0.9403077, b: 0.903, a: 0}
+    - _RimColor: {r: 1, g: 0.71705884, b: 0.5411765, a: 0}
     - _ShadowColor: {r: 0.5333333, g: 0.26274508, b: 0.25098038, a: 0}
     - _TerrainColor: {r: 0.9137255, g: 0.545098, b: 0.5254902, a: 0}
   m_BuildTextureStacks: []
