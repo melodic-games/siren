@@ -45,6 +45,12 @@ namespace Siren.Scripts.Terrain
             _meshGenThreads = new[]
             {
                 new Thread(ExternalThread),
+                new Thread(ExternalThread),
+                new Thread(ExternalThread),
+                new Thread(ExternalThread),
+                new Thread(ExternalThread),
+                new Thread(ExternalThread),
+                new Thread(ExternalThread),
                 new Thread(ExternalThread)
             };
 
