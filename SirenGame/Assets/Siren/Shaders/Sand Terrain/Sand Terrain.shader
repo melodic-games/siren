@@ -1,4 +1,4 @@
-// Made with Amplify Shader Editor v1.9.0.2
+// Made with Amplify Shader Editor v1.9.1.2
 // Available at the Unity Asset Store - http://u3d.as/y3X 
 Shader "Sand Terrain"
 {
@@ -9,6 +9,10 @@ Shader "Sand Terrain"
 		_RippleSize("Ripple Size", Float) = 50
 		[SingleLineTexture]_RipplesSteepTexture("Ripples Steep Texture", 2D) = "bump" {}
 		[SingleLineTexture]_RipplesShallowTexture("Ripples Shallow Texture", 2D) = "bump" {}
+		_GlitterSize("Glitter Size", Range( 0.001 , 0.1)) = 0.1
+		_GlitterThreshold("Glitter Threshold", Range( 0 , 8)) = 0.001
+		_GlitterNoiseTexture("Glitter Noise Texture", 2D) = "white" {}
+		_GliterColor("Gliter Color", Color) = (0,0,0,0)
 		_ColorTerrain("Color Terrain", Color) = (0.9137255,0.5450981,0.5254902,0)
 		_OceanSpecularPower("Ocean Specular Power", Float) = 64
 		_OceanSpecularStrength("Ocean Specular Strength", Float) = 0.5
@@ -17,7 +21,7 @@ Shader "Sand Terrain"
 		_RimStrength("Rim Strength", Float) = 1
 		_RimPower("Rim Power", Float) = 8
 		_GrainSize("Grain Size", Float) = 16
-		_GrainStrength("Grain Strength", Range( 0 , 1)) = 0.2
+		_GrainStrength("Grain Strength", Range( 0 , 1)) = 0.1
 		_GrainFalloffDistance("Grain Falloff Distance", Range( 0 , 10000)) = 1000
 		_GrainFalloffPower("Grain Falloff Power", Range( 0 , 1)) = 0.1
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
@@ -34,6 +38,7 @@ Shader "Sand Terrain"
 		#include "UnityCG.cginc"
 		#include "Lighting.cginc"
 		#pragma target 3.0
+		#include "Assets/Siren/Shaders/Snoise.cginc"
 		#ifdef UNITY_PASS_SHADOWCASTER
 			#undef INTERNAL_DATA
 			#undef WorldReflectionVector
@@ -80,57 +85,15 @@ Shader "Sand Terrain"
 		uniform float _OceanSpecularPower;
 		uniform float _OceanSpecularStrength;
 		uniform float4 _OceanSpecularColor;
+		uniform float4 _GliterColor;
+		uniform float _GlitterThreshold;
+		uniform sampler2D _GlitterNoiseTexture;
+		uniform float _GlitterSize;
 
 
-		float3 mod3D289( float3 x ) { return x - floor( x / 289.0 ) * 289.0; }
-
-		float4 mod3D289( float4 x ) { return x - floor( x / 289.0 ) * 289.0; }
-
-		float4 permute( float4 x ) { return mod3D289( ( x * 34.0 + 1.0 ) * x ); }
-
-		float4 taylorInvSqrt( float4 r ) { return 1.79284291400159 - r * 0.85373472095314; }
-
-		float snoise( float3 v )
+		inline float snoise_external( float3 In )
 		{
-			const float2 C = float2( 1.0 / 6.0, 1.0 / 3.0 );
-			float3 i = floor( v + dot( v, C.yyy ) );
-			float3 x0 = v - i + dot( i, C.xxx );
-			float3 g = step( x0.yzx, x0.xyz );
-			float3 l = 1.0 - g;
-			float3 i1 = min( g.xyz, l.zxy );
-			float3 i2 = max( g.xyz, l.zxy );
-			float3 x1 = x0 - i1 + C.xxx;
-			float3 x2 = x0 - i2 + C.yyy;
-			float3 x3 = x0 - 0.5;
-			i = mod3D289( i);
-			float4 p = permute( permute( permute( i.z + float4( 0.0, i1.z, i2.z, 1.0 ) ) + i.y + float4( 0.0, i1.y, i2.y, 1.0 ) ) + i.x + float4( 0.0, i1.x, i2.x, 1.0 ) );
-			float4 j = p - 49.0 * floor( p / 49.0 );  // mod(p,7*7)
-			float4 x_ = floor( j / 7.0 );
-			float4 y_ = floor( j - 7.0 * x_ );  // mod(j,N)
-			float4 x = ( x_ * 2.0 + 0.5 ) / 7.0 - 1.0;
-			float4 y = ( y_ * 2.0 + 0.5 ) / 7.0 - 1.0;
-			float4 h = 1.0 - abs( x ) - abs( y );
-			float4 b0 = float4( x.xy, y.xy );
-			float4 b1 = float4( x.zw, y.zw );
-			float4 s0 = floor( b0 ) * 2.0 + 1.0;
-			float4 s1 = floor( b1 ) * 2.0 + 1.0;
-			float4 sh = -step( h, 0.0 );
-			float4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
-			float4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
-			float3 g0 = float3( a0.xy, h.x );
-			float3 g1 = float3( a0.zw, h.y );
-			float3 g2 = float3( a1.xy, h.z );
-			float3 g3 = float3( a1.zw, h.w );
-			float4 norm = taylorInvSqrt( float4( dot( g0, g0 ), dot( g1, g1 ), dot( g2, g2 ), dot( g3, g3 ) ) );
-			g0 *= norm.x;
-			g1 *= norm.y;
-			g2 *= norm.z;
-			g3 *= norm.w;
-			float4 m = max( 0.6 - float4( dot( x0, x0 ), dot( x1, x1 ), dot( x2, x2 ), dot( x3, x3 ) ), 0.0 );
-			m = m* m;
-			m = m* m;
-			float4 px = float4( dot( x0, g0 ), dot( x1, g1 ), dot( x2, g2 ), dot( x3, g3 ) );
-			return 42.0 * dot( m, px);
+			return snoise(In);
 		}
 
 
@@ -178,19 +141,19 @@ Shader "Sand Terrain"
 			float3 lerpResult3_g212 = lerp( temp_output_18_0_g210 , appendResult23_g213.xyz , _RippleStrength);
 			float3 normalizeResult5_g212 = normalize( lerpResult3_g212 );
 			float3 ase_worldPos = i.worldPos;
-			float3 temp_output_6_0_g224 = ( ase_worldPos * _GrainSize );
-			float simplePerlin3D14_g224 = snoise( ( temp_output_6_0_g224 + float3(1349,6391,2465) ) );
-			simplePerlin3D14_g224 = simplePerlin3D14_g224*0.5 + 0.5;
-			float simplePerlin3D15_g224 = snoise( ( temp_output_6_0_g224 + float3(7827,2945,5698) ) );
-			simplePerlin3D15_g224 = simplePerlin3D15_g224*0.5 + 0.5;
-			float simplePerlin3D16_g224 = snoise( ( temp_output_6_0_g224 + float3(5282,4216,3212) ) );
-			simplePerlin3D16_g224 = simplePerlin3D16_g224*0.5 + 0.5;
-			float4 appendResult17_g224 = (float4(simplePerlin3D14_g224 , simplePerlin3D15_g224 , simplePerlin3D16_g224 , 0.0));
-			float4 normalizeResult34_g224 = normalize( appendResult17_g224 );
-			float temp_output_1_0_g225 = 0.0;
-			float3 lerpResult3_g226 = lerp( normalizeResult5_g212 , normalizeResult34_g224.xyz , ( _GrainStrength * ( 1.0 - pow( ( ( distance( _WorldSpaceCameraPos , ase_worldPos ) - temp_output_1_0_g225 ) / ( _GrainFalloffDistance - temp_output_1_0_g225 ) ) , _GrainFalloffPower ) ) ));
-			float3 normalizeResult5_g226 = normalize( lerpResult3_g226 );
-			float3 Normals169 = normalizeResult5_g226;
+			float3 temp_output_7_0_g249 = ( ase_worldPos * _GrainSize );
+			float3 In5_g249 = ( temp_output_7_0_g249 + float3(1349,6391,2465) );
+			float localsnoise_external5_g249 = snoise_external( In5_g249 );
+			float3 In4_g249 = ( temp_output_7_0_g249 + float3(7827,2945,5698) );
+			float localsnoise_external4_g249 = snoise_external( In4_g249 );
+			float3 In3_g249 = ( temp_output_7_0_g249 + float3(5282,4216,3212) );
+			float localsnoise_external3_g249 = snoise_external( In3_g249 );
+			float3 appendResult15_g249 = (float3(localsnoise_external5_g249 , localsnoise_external4_g249 , localsnoise_external3_g249));
+			float3 normalizeResult9_g249 = normalize( appendResult15_g249 );
+			float temp_output_1_0_g247 = 0.0;
+			float3 lerpResult3_g248 = lerp( normalizeResult5_g212 , normalizeResult9_g249 , ( _GrainStrength * ( 1.0 - pow( ( ( distance( _WorldSpaceCameraPos , ase_worldPos ) - temp_output_1_0_g247 ) / ( _GrainFalloffDistance - temp_output_1_0_g247 ) ) , _GrainFalloffPower ) ) ));
+			float3 normalizeResult5_g248 = normalize( lerpResult3_g248 );
+			float3 Normals169 = normalizeResult5_g248;
 			#if defined(LIGHTMAP_ON) && UNITY_VERSION < 560 //aseld
 			float3 ase_worldlightDir = 0;
 			#else //aseld
@@ -203,17 +166,24 @@ Shader "Sand Terrain"
 			#else //aselc
 			float4 ase_lightColor = _LightColor0;
 			#endif //aselc
+			float3 ase_normWorldNormal = normalize( ase_worldNormal );
 			UnityGI gi159 = gi;
-			float3 diffNorm159 = ase_worldNormal;
+			float3 diffNorm159 = ase_normWorldNormal;
 			gi159 = UnityGI_Base( data, 1, diffNorm159 );
 			float3 indirectDiffuse159 = gi159.indirect.diffuse + diffNorm159 * 0.0001;
 			float3 ase_worldViewDir = normalize( UnityWorldSpaceViewDir( ase_worldPos ) );
-			float3 temp_output_2_0_g237 = Normals169;
-			float fresnelNdotV15_g237 = dot( temp_output_2_0_g237, ase_worldViewDir );
-			float fresnelNode15_g237 = ( 0.0 + _RimStrength * pow( 1.0 - fresnelNdotV15_g237, _RimPower ) );
-			float3 normalizeResult4_g236 = normalize( ( ase_worldViewDir + ase_worldlightDir ) );
-			float dotResult6_g236 = dot( Normals169 , normalizeResult4_g236 );
-			float4 Specular176 = ( saturate( max( ( fresnelNode15_g237 * _RimColor ) , ( ( pow( saturate( dotResult6_g236 ) , _OceanSpecularPower ) * _OceanSpecularStrength ) * _OceanSpecularColor ) ) ) * LightData172 );
+			float3 temp_output_2_0_g241 = Normals169;
+			float fresnelNdotV15_g241 = dot( temp_output_2_0_g241, ase_worldViewDir );
+			float fresnelNode15_g241 = ( 0.0 + _RimStrength * pow( 1.0 - fresnelNdotV15_g241, _RimPower ) );
+			float3 normalizeResult4_g240 = normalize( ( ase_worldViewDir + ase_worldlightDir ) );
+			float dotResult6_g240 = dot( Normals169 , normalizeResult4_g240 );
+			float2 appendResult18_g317 = (float2(ase_worldPos.x , ase_worldPos.z));
+			float4 break21_g317 = tex2D( _GlitterNoiseTexture, ( appendResult18_g317 * _GlitterSize ) );
+			float3 appendResult22_g317 = (float3(break21_g317.r , break21_g317.g , break21_g317.b));
+			float3 temp_cast_2 = (1.0).xxx;
+			float dotResult5_g317 = dot( reflect( ase_worldlightDir , ( ( appendResult22_g317 * 2.0 ) - temp_cast_2 ) ) , ase_worldViewDir );
+			float smoothstepResult33_g317 = smoothstep( _GlitterThreshold , ( _GlitterThreshold + 0.001 ) , max( 0.0 , dotResult5_g317 ));
+			float4 Specular176 = ( ( saturate( max( ( fresnelNode15_g241 * _RimColor ) , ( ( pow( saturate( dotResult6_g240 ) , _OceanSpecularPower ) * _OceanSpecularStrength ) * _OceanSpecularColor ) ) ) * LightData172 ) + ( _GliterColor * smoothstepResult33_g317 ) );
 			c.rgb = ( ( float4( ( ( LightData172 * ase_lightColor.rgb ) + indirectDiffuse159 ) , 0.0 ) * _ColorTerrain ) + Specular176 ).rgb;
 			c.a = 1;
 			return c;
@@ -320,55 +290,48 @@ Shader "Sand Terrain"
 	CustomEditor "ASEMaterialInspector"
 }
 /*ASEBEGIN
-Version=19002
-1922;23;1920;1059;4385.948;847.245;2.965977;True;False
-Node;AmplifyShaderEditor.CommentaryNode;80;-3015.894,286.9253;Inherit;False;1635.906;312.7277;;4;124;169;122;30;Normals;1,1,1,1;0;0
+Version=19102
+Node;AmplifyShaderEditor.CommentaryNode;80;-3015.894,286.9253;Inherit;False;1635.906;312.7277;;3;169;122;30;Normals;1,1,1,1;0;0
 Node;AmplifyShaderEditor.WorldNormalVector;30;-2963.227,335.5919;Inherit;False;False;1;0;FLOAT3;0,0,1;False;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3
 Node;AmplifyShaderEditor.FunctionNode;122;-2616.596,373.9987;Inherit;False;Sand Terrain Ripples Normal;0;;210;6ed8ef22b18433949a2efc526b57ab12;0;1;18;FLOAT3;0,0,0;False;1;FLOAT3;0
-Node;AmplifyShaderEditor.FunctionNode;124;-2161.833,377.7904;Inherit;False;Sand Terrain Grain Normal;15;;224;37f47e9c36ddce14d8e40d0ee62cb800;0;1;20;FLOAT3;0,0,0;False;1;FLOAT3;0
 Node;AmplifyShaderEditor.CommentaryNode;64;-3016.722,708.6507;Inherit;False;1652.74;389.8334;;5;165;172;175;104;184;Light Data;1,1,1,1;0;0
 Node;AmplifyShaderEditor.RegisterLocalVarNode;169;-1680.252,367.3564;Inherit;False;Normals;-1;True;1;0;FLOAT3;0,0,0;False;1;FLOAT3;0
-Node;AmplifyShaderEditor.CommentaryNode;93;-3009.872,1171.915;Inherit;False;1649;317.9464;;8;176;178;177;92;91;151;182;171;Specular;1,1,1,1;0;0
+Node;AmplifyShaderEditor.CommentaryNode;93;-3009.872,1171.915;Inherit;False;1681.896;338.1208;;10;230;227;176;177;178;92;182;91;151;171;Specular;1,1,1,1;0;0
 Node;AmplifyShaderEditor.GetLocalVarNode;165;-2776.135,881.2961;Inherit;False;169;Normals;1;0;OBJECT;;False;1;FLOAT3;0
 Node;AmplifyShaderEditor.LightAttenuation;104;-2444.948,981.0936;Inherit;False;0;1;FLOAT;0
 Node;AmplifyShaderEditor.GetLocalVarNode;171;-2918.427,1308.809;Inherit;False;169;Normals;1;0;OBJECT;;False;1;FLOAT3;0
 Node;AmplifyShaderEditor.FunctionNode;184;-2453.651,820.6941;Inherit;False;JourneyLambert;-1;;239;1c5ef3f64a9db8d42b8593728b2d6860;0;1;1;FLOAT3;0,0,0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.FunctionNode;182;-2612.265,1370.449;Inherit;False;Sand Terrain Ocean Specular;7;;236;5898ff5fa4e14ba42940e8fcbe657e2c;0;1;7;FLOAT3;0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;175;-1945.752,866.7718;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.FunctionNode;151;-2610.762,1234.249;Inherit;False;Sand Terrain Rim Lighting;11;;237;0eda5e26ec7dfb44f91b09cd751bb2b8;0;1;2;FLOAT3;0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.SimpleMaxOpNode;91;-2271.229,1283.739;Inherit;False;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.FunctionNode;151;-2610.762,1234.249;Inherit;False;Sand Terrain Rim Lighting;16;;241;0eda5e26ec7dfb44f91b09cd751bb2b8;0;1;2;FLOAT3;0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.RegisterLocalVarNode;172;-1626.452,867.4645;Inherit;False;LightData;-1;True;1;0;FLOAT;0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.LightColorNode;156;-915.7093,706.4875;Inherit;False;0;3;COLOR;0;FLOAT3;1;FLOAT;2
-Node;AmplifyShaderEditor.SaturateNode;92;-2068.275,1239.618;Inherit;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.GetLocalVarNode;177;-2090.783,1378.978;Inherit;False;172;LightData;1;0;OBJECT;;False;1;FLOAT;0
 Node;AmplifyShaderEditor.GetLocalVarNode;173;-934.5043,517.443;Inherit;False;172;LightData;1;0;OBJECT;;False;1;FLOAT;0
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;178;-1822.077,1297.319;Inherit;False;2;2;0;COLOR;0,0,0,0;False;1;FLOAT;0;False;1;COLOR;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;170;-568.3694,565.0903;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0
 Node;AmplifyShaderEditor.IndirectDiffuseLighting;159;-659.1457,906.7454;Inherit;False;Tangent;1;0;FLOAT3;0,0,1;False;1;FLOAT3;0
-Node;AmplifyShaderEditor.RegisterLocalVarNode;176;-1593.036,1312.263;Inherit;False;Specular;-1;True;1;0;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.SimpleAddOpNode;158;-171.7867,739.612;Inherit;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0
-Node;AmplifyShaderEditor.ColorNode;95;-222.5822,1168.47;Inherit;False;Property;_ColorTerrain;Color Terrain;6;0;Create;True;0;0;0;False;0;False;0.9137255,0.5450981,0.5254902,0;0.6666667,0.3788889,0.1999999,1;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.ColorNode;95;-222.5822,1168.47;Inherit;False;Property;_ColorTerrain;Color Terrain;11;0;Create;True;0;0;0;False;0;False;0.9137255,0.5450981,0.5254902,0;0.6666667,0.3788888,0.1999998,1;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.GetLocalVarNode;179;269.2328,1301.807;Inherit;False;176;Specular;1;0;OBJECT;;False;1;COLOR;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;160;277.4301,951.9128;Inherit;False;2;2;0;FLOAT3;0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.SimpleAddOpNode;164;675.2074,1133.995;Inherit;False;2;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;870.2872,894.0468;Float;False;True;-1;2;ASEMaterialInspector;0;0;CustomLighting;Sand Terrain;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;False;;0;False;;False;0;False;;0;False;;False;0;Opaque;0.5;True;True;0;False;Opaque;;Geometry;All;18;all;True;True;True;True;0;False;;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;2;15;10;25;False;0.5;True;0;0;False;;0;False;;0;0;False;;0;False;;0;False;;0;False;;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;True;Relative;0;;-1;-1;-1;-1;0;False;0;0;False;;-1;0;False;;0;0;0;False;0.1;False;;0;False;;False;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.StandardSurfaceOutputNode;0;870.2872,894.0468;Float;False;True;-1;2;ASEMaterialInspector;0;0;CustomLighting;Sand Terrain;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;Back;0;False;;0;False;;False;0;False;;0;False;;False;0;Opaque;0.5;True;True;0;False;Opaque;;Geometry;All;12;all;True;True;True;True;0;False;;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;2;15;10;25;False;0.5;True;0;0;False;;0;False;;0;0;False;;0;False;;0;False;;0;False;;0;False;0;0,0,0,0;VertexOffset;True;False;Cylindrical;False;True;Relative;0;;-1;-1;-1;-1;0;False;0;0;False;;-1;0;False;;0;0;0;False;0.1;False;;0;False;;False;15;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;2;FLOAT3;0,0,0;False;3;FLOAT3;0,0,0;False;4;FLOAT;0;False;6;FLOAT3;0,0,0;False;7;FLOAT3;0,0,0;False;8;FLOAT;0;False;9;FLOAT;0;False;10;FLOAT;0;False;13;FLOAT3;0,0,0;False;11;FLOAT3;0,0,0;False;12;FLOAT3;0,0,0;False;14;FLOAT4;0,0,0,0;False;15;FLOAT3;0,0,0;False;0
+Node;AmplifyShaderEditor.FunctionNode;186;-2161.833,377.7904;Inherit;False;Sand Terrain Grain Normal;20;;246;37f47e9c36ddce14d8e40d0ee62cb800;0;1;20;FLOAT3;0,0,0;False;1;FLOAT3;0
+Node;AmplifyShaderEditor.SimpleMaxOpNode;91;-2338.831,1277.239;Inherit;False;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.FunctionNode;182;-2628.665,1341.848;Inherit;False;Sand Terrain Ocean Specular;12;;240;5898ff5fa4e14ba42940e8fcbe657e2c;0;1;7;FLOAT3;0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.SaturateNode;92;-2170.509,1226.351;Inherit;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;178;-1945.623,1273.398;Inherit;False;2;2;0;COLOR;0,0,0,0;False;1;FLOAT;0;False;1;COLOR;0
+Node;AmplifyShaderEditor.GetLocalVarNode;177;-2185.915,1324.869;Inherit;False;172;LightData;1;0;OBJECT;;False;1;FLOAT;0
+Node;AmplifyShaderEditor.RegisterLocalVarNode;176;-1544.804,1274.085;Inherit;False;Specular;-1;True;1;0;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.FunctionNode;227;-2010.655,1401.103;Inherit;False;Sand Terrain Glitter Specular;6;;317;d5878071f536945bea46797893d17372;0;0;1;COLOR;0
+Node;AmplifyShaderEditor.SimpleAddOpNode;230;-1716.109,1300.129;Inherit;False;2;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
 WireConnection;122;18;30;0
-WireConnection;124;20;122;0
-WireConnection;169;0;124;0
+WireConnection;169;0;186;0
 WireConnection;184;1;165;0
-WireConnection;182;7;171;0
 WireConnection;175;0;184;0
 WireConnection;175;1;104;0
 WireConnection;151;2;171;0
-WireConnection;91;0;151;0
-WireConnection;91;1;182;0
 WireConnection;172;0;175;0
-WireConnection;92;0;91;0
-WireConnection;178;0;92;0
-WireConnection;178;1;177;0
 WireConnection;170;0;173;0
 WireConnection;170;1;156;1
-WireConnection;176;0;178;0
 WireConnection;158;0;170;0
 WireConnection;158;1;159;0
 WireConnection;160;0;158;0
@@ -376,5 +339,15 @@ WireConnection;160;1;95;0
 WireConnection;164;0;160;0
 WireConnection;164;1;179;0
 WireConnection;0;13;164;0
+WireConnection;186;20;122;0
+WireConnection;91;0;151;0
+WireConnection;91;1;182;0
+WireConnection;182;7;171;0
+WireConnection;92;0;91;0
+WireConnection;178;0;92;0
+WireConnection;178;1;177;0
+WireConnection;176;0;230;0
+WireConnection;230;0;178;0
+WireConnection;230;1;227;0
 ASEEND*/
-//CHKSM=821214F3C5F9BB3589E671077BD7DC36ACC7F74C
+//CHKSM=16CE42AFBA4CA0DBBFA8B2C0ACD67A7A3E709605

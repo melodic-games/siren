@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b2425a2284af743826c689403a4924, type: 3}
+  m_Name: Sand Terrain Glitter Specular
+  m_EditorClassIdentifier: 
+  m_functionInfo: "// Made with Amplify Shader Editor v1.9.1.2\n// Available at the
+    Unity Asset Store - http://u3d.as/y3X \n/*ASEBEGIN\nVersion=19102\nNode;AmplifyShaderEditor.DynamicAppendNode;18;-1577.308,-189.2936;Inherit;False;FLOAT2;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT;0;False;1;FLOAT2;0\nNode;AmplifyShaderEditor.WorldPosInputsNode;17;-1793.937,-233.7906;Inherit;False;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;19;-1356.382,-154.2463;Inherit;False;2;2;0;FLOAT2;0,0;False;1;FLOAT;0;False;1;FLOAT2;0\nNode;AmplifyShaderEditor.DynamicAppendNode;22;-643.1135,-180.4924;Inherit;False;FLOAT3;4;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT;0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.RangedFloatNode;24;-651.465,-53.82688;Inherit;False;Constant;_Float2;Float
+    2;3;0;Create;True;0;0;0;False;0;False;2;0;0;0;0;1;FLOAT;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;23;-448.2437,-152.6537;Inherit;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.SimpleSubtractOpNode;26;-246.4138,-105.3282;Inherit;False;2;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.RangedFloatNode;27;-405.0936,-30.16403;Inherit;False;Constant;_Float3;Float
+    3;3;0;Create;True;0;0;0;False;0;False;1;0;0;0;0;1;FLOAT;0\nNode;AmplifyShaderEditor.RangedFloatNode;2;-1654.719,-64.13078;Inherit;False;Property;_GlitterSize;Glitter
+    Size;0;0;Create;True;0;0;0;False;0;False;0.1;100;0.001;0.1;0;1;FLOAT;0\nNode;AmplifyShaderEditor.SamplerNode;16;-1193.423,-217.4586;Inherit;True;Property;_TextureSample0;Texture
+    Sample 0;3;0;Create;True;0;0;0;False;0;False;-1;None;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;8;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;6;FLOAT;0;False;7;SAMPLERSTATE;;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4\nNode;AmplifyShaderEditor.TexturePropertyNode;15;-1456.608,-387.3518;Inherit;True;Property;_GlitterNoiseTexture;Glitter
+    Noise Texture;2;0;Create;True;0;0;0;False;0;False;7bc7cb6a4022041cc889b642a6273e2c;7bc7cb6a4022041cc889b642a6273e2c;False;white;Auto;Texture2D;-1;0;2;SAMPLER2D;0;SAMPLERSTATE;1\nNode;AmplifyShaderEditor.BreakToComponentsNode;21;-836.728,-202.0167;Inherit;False;COLOR;1;0;COLOR;0,0,0,0;False;16;FLOAT;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT;5;FLOAT;6;FLOAT;7;FLOAT;8;FLOAT;9;FLOAT;10;FLOAT;11;FLOAT;12;FLOAT;13;FLOAT;14;FLOAT;15\nNode;AmplifyShaderEditor.WorldSpaceLightDirHlpNode;4;-316.8608,-298.7402;Inherit;False;False;1;0;FLOAT;0;False;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3\nNode;AmplifyShaderEditor.ReflectOpNode;3;-32.10733,-202.8075;Inherit;False;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0\nNode;AmplifyShaderEditor.ViewDirInputsCoordNode;6;-22.59335,-77.56834;Inherit;False;World;False;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3\nNode;AmplifyShaderEditor.SimpleAddOpNode;34;642.345,-24.39498;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.RangedFloatNode;35;404.4455,-6.194841;Inherit;False;Constant;_Float0;Float
+    0;3;0;Create;True;0;0;0;False;0;False;0.001;0;0;0;0;1;FLOAT;0\nNode;AmplifyShaderEditor.SmoothstepOpNode;33;825.645,-121.8946;Inherit;False;3;0;FLOAT;0;False;1;FLOAT;0.5;False;2;FLOAT;0.5001;False;1;FLOAT;0\nNode;AmplifyShaderEditor.SimpleMaxOpNode;32;543.9457,-248.6956;Inherit;False;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.DotProductOpNode;5;251.3349,-212.0431;Inherit;False;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT;0\nNode;AmplifyShaderEditor.RangedFloatNode;11;379.9154,-110.135;Inherit;False;Property;_GlitterThreshold;Glitter
+    Threshold;0;0;Create;True;0;0;0;False;0;False;0.001;0.001;0;8;0;1;FLOAT;0\nNode;AmplifyShaderEditor.SimpleMultiplyOpNode;37;1131.146,-288.295;Inherit;False;2;2;0;COLOR;0,0,0,0;False;1;FLOAT;0;False;1;COLOR;0\nNode;AmplifyShaderEditor.FunctionOutput;0;1364.346,-230.0936;Inherit;False;True;-1;Output;0;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0\nNode;AmplifyShaderEditor.ColorNode;36;817.8461,-393.5952;Inherit;False;Property;_GliterColor;Gliter
+    Color;3;0;Create;True;0;0;0;False;0;False;0,0,0,0;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4\nWireConnection;18;0;17;1\nWireConnection;18;1;17;3\nWireConnection;19;0;18;0\nWireConnection;19;1;2;0\nWireConnection;22;0;21;0\nWireConnection;22;1;21;1\nWireConnection;22;2;21;2\nWireConnection;23;0;22;0\nWireConnection;23;1;24;0\nWireConnection;26;0;23;0\nWireConnection;26;1;27;0\nWireConnection;16;0;15;0\nWireConnection;16;1;19;0\nWireConnection;21;0;16;0\nWireConnection;3;0;4;0\nWireConnection;3;1;26;0\nWireConnection;34;0;11;0\nWireConnection;34;1;35;0\nWireConnection;33;0;32;0\nWireConnection;33;1;11;0\nWireConnection;33;2;34;0\nWireConnection;32;1;5;0\nWireConnection;5;0;3;0\nWireConnection;5;1;6;0\nWireConnection;37;0;36;0\nWireConnection;37;1;33;0\nWireConnection;0;0;37;0\nASEEND*/\n//CHKSM=E9846F903D407B17F08A500BC5BC488666F81AC8"
+  m_functionName: 
+  m_description: 
+  m_additionalIncludes:
+    m_additionalIncludes: []
+    m_outsideIncludes: []
+  m_additionalPragmas:
+    m_additionalPragmas: []
+    m_outsidePragmas: []
+  m_additionalDirectives:
+    m_validData: 0
+    m_isDirty: 0
+    m_moduleName: ' Additional Directives'
+    m_independentModule: 1
+    m_customEdited: 0
+    m_additionalDirectives: []
+    m_shaderFunctionDirectives: []
+    m_nativeDirectives: []
+    m_nativeDirectivesIndex: -1
+    m_nativeDirectivesFoldout: 0
+    m_directivesSaveItems: []
+  m_nodeCategory: 3
+  m_headerStyle: 0
+  m_headerColor: {r: 1, g: 0.4, b: 0, a: 1}
+  m_customNodeCategory: 
+  m_previewPosition: 0
+  m_hidden: 0
+  m_url: 

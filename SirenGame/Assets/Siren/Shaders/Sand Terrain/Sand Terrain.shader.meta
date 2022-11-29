@@ -7,6 +7,8 @@ ShaderImporter:
       type: 3}
   - _RipplesShallowTexture: {fileID: 2800000, guid: 0a4db46a603cdb948be554ac81ff5f20,
       type: 3}
+  - _GlitterNoiseTexture: {fileID: 2800000, guid: 7bc7cb6a4022041cc889b642a6273e2c,
+      type: 3}
   nonModifiableTextures: []
   preprocessorOverride: 0
   userData: 
