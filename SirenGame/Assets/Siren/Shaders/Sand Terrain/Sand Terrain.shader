@@ -13,7 +13,7 @@ Shader "Sand Terrain"
 		_GlitterFade("Glitter Fade", Range( 0 , 0.2)) = 0.1
 		_GlitterSize("Glitter Size", Range( 0.001 , 0.1)) = 0.015
 		_GlitterNoiseTexture("Glitter Noise Texture", 2D) = "white" {}
-		_GliterColor("Gliter Color", Color) = (0,0,0,0)
+		[HDR]_GliterColor("Gliter Color", Color) = (0,0,0,0)
 		_ColorTerrain("Color Terrain", Color) = (0.9137255,0.5450981,0.5254902,0)
 		_OceanSpecularPower("Ocean Specular Power", Float) = 64
 		_OceanSpecularStrength("Ocean Specular Strength", Float) = 0.5
@@ -353,4 +353,4 @@ WireConnection;178;0;92;0
 WireConnection;178;1;177;0
 WireConnection;176;0;178;0
 ASEEND*/
-//CHKSM=3B2568E8E6F4E26EF056D18866EDEC2CE8B86840
+//CHKSM=8043C15E12AB46581EB29FC93715AA3BA7D0474E
