@@ -95,8 +95,8 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _GlitterFade: 0.1
-    - _GlitterSize: 0.015
-    - _GlitterThreshold: 0.94
+    - _GlitterSize: 16
+    - _GlitterThreshold: 0.95
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -126,7 +126,7 @@ Material:
     - _ColorShadow: {r: 0.35499996, g: 0.17826176, b: 0.16912013, a: 1}
     - _ColorTerrain: {r: 0.6666667, g: 0.3788887, b: 0.19999969, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GliterColor: {r: 1, g: 0.83923364, b: 0.7311321, a: 1}
+    - _GliterColor: {r: 0.990566, g: 0.67001486, b: 0.5934051, a: 1}
     - _OceanSpecularColor: {r: 1, g: 0.9403077, b: 0.903, a: 0}
     - _RimColor: {r: 1, g: 0.71705884, b: 0.5411765, a: 0}
     - _ShadowColor: {r: 0.5333333, g: 0.26274508, b: 0.25098038, a: 0}
