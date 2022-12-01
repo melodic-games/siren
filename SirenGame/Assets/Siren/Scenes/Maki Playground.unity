@@ -190,7 +190,7 @@ GameObject:
   - component: {fileID: 167013783}
   - component: {fileID: 167013782}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: Portal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -267,12 +267,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 167013781}
   m_LocalRotation: {x: -0, y: 1, z: -0, w: -0.0000001490116}
-  m_LocalPosition: {x: 11.11, y: 1.65, z: 23.93}
+  m_LocalPosition: {x: 9.14, y: 1.65, z: 14.47}
   m_LocalScale: {x: 3.3436, y: 5.0154, z: 1.2520278}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &202449997
 GameObject:
@@ -539,7 +539,7 @@ GameObject:
   - component: {fileID: 348732584}
   - component: {fileID: 348732583}
   m_Layer: 0
-  m_Name: Siren Colors Controller
+  m_Name: World Color Palette Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -554,9 +554,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 348732582}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07a16dee1b65e8345b7980f9b681918b, type: 3}
+  m_Script: {fileID: 11500000, guid: 2387ac2f1f474b528a7ac8184978d59c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  worldColorPalette: {fileID: 11400000, guid: 7a2540459a269f346ae65ccc449509ec, type: 2}
 --- !u!4 &348732584
 Transform:
   m_ObjectHideFlags: 0
@@ -1432,7 +1433,7 @@ GameObject:
   - component: {fileID: 1459464634}
   - component: {fileID: 1459464633}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Water
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1514,7 +1515,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1484968167
 GameObject:

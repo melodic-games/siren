@@ -73,12 +73,16 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _Intensity: 0.02
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _OceanSpecularPower: 64
     - _OceanSpecularStrength: 0.5
     - _Parallax: 0.02
+    - _RippleOpacity: 0.5
+    - _RippleWidth: 0.1
+    - _Scale: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
