@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -27,13 +28,11 @@ namespace Siren.Scripts.Terrain
 
         private InfiniteTerrainAreaModifier[] _areaModifiers;
 
-        private readonly Dictionary<Vector2Int, InfiniteTerrainChunk> _chunks = new();
-        private readonly object _chunksLock = new();
+        private readonly ConcurrentDictionary<Vector2Int, InfiniteTerrainChunk> _chunks = new();
 
         private Vector2Int _lastPlayerPosition = new(999999, 999999);
 
-        private Vector2Int[] _currentSortedChunkPositions = { };
-        private readonly object _currentSortedChunkPositionsLock = new();
+        private ConcurrentQueue<Vector2Int> _currentSortedChunkPositions = new();
 
         private Thread[] _meshGenThreads;
         private bool _externalThreadRunning = true;
@@ -128,25 +127,19 @@ namespace Siren.Scripts.Terrain
 
         public void DeleteAllChunks()
         {
-            lock (_chunksLock)
+            foreach (var chunk in _chunks.Values)
             {
-                foreach (var chunk in _chunks.Values)
-                {
-                    DestroyChunk(chunk);
-                }
-
-                _chunks.Clear();
+                DestroyChunk(chunk);
             }
+
+            _chunks.Clear();
         }
 
         public void ReloadAllChunks()
         {
-            lock (_chunksLock)
+            foreach (var chunk in _chunks.Values)
             {
-                foreach (var chunk in _chunks.Values)
-                {
-                    chunk.ReloadThreadSafe();
-                }
+                chunk.ReloadThreadSafe();
             }
         }
 
@@ -169,20 +162,14 @@ namespace Siren.Scripts.Terrain
                 .ToArray();
         }
 
-        private void SetThreadSafeChunk(Vector2Int position, InfiniteTerrainChunk chunk)
+        private void SetChunk(Vector2Int position, InfiniteTerrainChunk chunk)
         {
-            lock (_chunksLock)
-            {
-                _chunks[position] = chunk;
-            }
+            _chunks[position] = chunk;
         }
 
-        private InfiniteTerrainChunk GetThreadSafeChunk(Vector2Int position)
+        private InfiniteTerrainChunk GetChunk(Vector2Int position)
         {
-            lock (_chunksLock)
-            {
-                return _chunks.TryGetValue(position, out var chunk) ? chunk : null;
-            }
+            return _chunks.TryGetValue(position, out var chunk) ? chunk : null;
         }
 
         private Vector2Int GetPlayerChunkPosition()
@@ -256,17 +243,11 @@ namespace Siren.Scripts.Terrain
             {
                 // find closest chunk that needs work
 
-                Vector2Int[] currentSortedChunkPositions;
-                lock (_currentSortedChunkPositionsLock)
-                {
-                    currentSortedChunkPositions = _currentSortedChunkPositions;
-                }
-
                 InfiniteTerrainChunk chunk = null;
 
-                foreach (var position in currentSortedChunkPositions)
+                foreach (var position in _currentSortedChunkPositions)
                 {
-                    var queryChunk = GetThreadSafeChunk(position);
+                    var queryChunk = GetChunk(position);
                     if (
                         queryChunk == null ||
                         queryChunk.doingExternalThreadWork ||
@@ -279,6 +260,8 @@ namespace Siren.Scripts.Terrain
                 if (chunk == null) continue;
 
                 await chunk.DoExternalThreadWork();
+                
+                
             }
         }
 
@@ -290,9 +273,11 @@ namespace Siren.Scripts.Terrain
             if (playerChunkPosition != _lastPlayerPosition)
             {
                 var currentSortedChunkPositions = GetSpiralChunkPositionsAroundPlayer(playerChunkPosition);
-                lock (_currentSortedChunkPositionsLock)
+
+                _currentSortedChunkPositions.Clear();
+                foreach (var chunkPosition in currentSortedChunkPositions)
                 {
-                    _currentSortedChunkPositions = currentSortedChunkPositions;
+                    _currentSortedChunkPositions.Enqueue(chunkPosition);
                 }
 
                 _lastPlayerPosition = playerChunkPosition;
@@ -305,7 +290,7 @@ namespace Siren.Scripts.Terrain
 
             foreach (var chunkPosition in _currentSortedChunkPositions)
             {
-                var chunk = GetThreadSafeChunk(chunkPosition);
+                var chunk = GetChunk(chunkPosition);
                 if (chunk != null)
                 {
                     // if thread generated mesh data but it's not been applied yet (has to be done in main thread)
@@ -319,7 +304,7 @@ namespace Siren.Scripts.Terrain
                 {
                     // make a chunk
                     chunk = CreateChunkGameObject(chunkPosition);
-                    SetThreadSafeChunk(chunkPosition, chunk);
+                    SetChunk(chunkPosition, chunk);
                 }
             }
 
@@ -327,20 +312,11 @@ namespace Siren.Scripts.Terrain
 
             if (playedMovedChunk)
             {
-                InfiniteTerrainChunk[] chunks;
-                lock (_chunksLock)
-                {
-                    chunks = _chunks.Values.ToArray();
-                }
-
-                foreach (var chunk in chunks)
+                foreach (var chunk in _chunks.Values)
                 {
                     if (_currentSortedChunkPositions.Contains(chunk.chunkPosition)) continue;
                     DestroyChunk(chunk);
-                    lock (_chunksLock)
-                    {
-                        _chunks.Remove(chunk.chunkPosition);
-                    }
+                    _chunks.Remove(chunk.chunkPosition, out _);
                 }
             }
         }
