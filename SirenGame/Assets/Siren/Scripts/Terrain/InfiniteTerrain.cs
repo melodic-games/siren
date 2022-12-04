@@ -260,8 +260,6 @@ namespace Siren.Scripts.Terrain
                 if (chunk == null) continue;
 
                 await chunk.DoExternalThreadWork();
-                
-                
             }
         }
 
