@@ -121,7 +121,7 @@ namespace Siren.Scripts.Terrain
                 DestroyImmediate(chunk.gameObject);
             }
 #else
-            Destroy(chunk.gameObject)
+            Destroy(chunk.gameObject);
 #endif
         }
 
