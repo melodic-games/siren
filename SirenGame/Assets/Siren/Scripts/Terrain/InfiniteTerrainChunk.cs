@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Siren.Scripts.UI;
 using UnityEngine;
@@ -40,6 +41,14 @@ namespace Siren.Scripts.Terrain
         // {
         //     GizmoUtils.DrawBounds(_bounds);
         // }
+
+        private void Start()
+        {
+            // idk contribute gi should be disabled but we can do this by just setting the game object to static
+// #if UNITY_EDITOR
+//             GameObjectUtility.SetStaticEditorFlags(gameObject, StaticEditorFlags.ContributeGI);
+// #endif
+        }
 
         private float GetNoise(float x, float z, float noiseSize, float noiseHeight)
         {
@@ -238,6 +247,8 @@ namespace Siren.Scripts.Terrain
             // _mesh.RecalculateNormals();
             _mesh.RecalculateBounds();
             // _mesh.Optimize();
+            
+            _mesh.UploadMeshData(true);
 
             _meshInstanceId = _mesh.GetInstanceID();
 

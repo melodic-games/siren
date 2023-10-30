@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,6 +19,8 @@ namespace Siren.Scripts.Terrain
         [Header("General"), Range(1, 32f)] public int viewDistance = 4;
         public Transform playerCharacterTransform;
         public Material terrainMaterial;
+        public bool showChunksInEditor;
+        private bool _showChunksInEditorChange;
 
         [Header("Generation"), Range(64f, 1024f)]
         public int chunkSize = 500;
@@ -39,6 +42,8 @@ namespace Siren.Scripts.Terrain
 
         private void OnEnable()
         {
+            _showChunksInEditorChange = showChunksInEditor;
+            
             _externalThreadRunning = true;
 
             _meshGenThreads = new[]
@@ -145,13 +150,26 @@ namespace Siren.Scripts.Terrain
 
         private void OnValidate()
         {
+#if UNITY_EDITOR
             // when parameters change
             _lastPlayerPosition = new Vector2Int(999, 999);
 
+            if (showChunksInEditor != _showChunksInEditorChange)
+            {
+                _showChunksInEditorChange = showChunksInEditor;
+                foreach (var (_, chunk) in _chunks)
+                {
+                    chunk.gameObject.hideFlags = showChunksInEditor ? HideFlags.DontSave : HideFlags.HideAndDontSave;
+                }
+                EditorSceneManager.MarkSceneDirty(gameObject.scene);
+                return;
+            }
+            
             // TODO: chunk size changes doesnt work with reload all chunks 
 
             // DeleteAllChunks();
             ReloadAllChunks();
+#endif
         }
 
         public InfiniteTerrainAreaModifier[] GetAreaModifiersInBoundsOrdered(Bounds bounds)
@@ -219,14 +237,13 @@ namespace Siren.Scripts.Terrain
             var chunk = new GameObject
             {
                 name = $"Chunk {chunkPosition.x},{chunkPosition.y}",
-                isStatic = true,
+                isStatic = false,
                 transform =
                 {
                     position = position,
                     parent = transform
                 },
-                hideFlags = HideFlags.DontSave
-                // hideFlags = HideFlags.HideAndDontSave
+                hideFlags = showChunksInEditor ? HideFlags.DontSave : HideFlags.HideAndDontSave
             };
 
             var infiniteTerrainChunk = chunk.AddComponent<InfiniteTerrainChunk>();
